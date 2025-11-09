@@ -2,14 +2,18 @@ import {Router} from 'express';
 import {
     addBloodDonation,
     giveBloodDonation,
+    getEmergenciesByHospital
 } from '../controllers/hospital/hospital.controller.js';
 import {verifyAccessToken} from '../middlewares/index.js';
 
-const authRouter = Router();
+const hospitalRouter = Router();
 
-authRouter.route('/addBloodDonation').post(verifyAccessToken, addBloodDonation);
-authRouter
+hospitalRouter.route('/addBloodDonation').post(verifyAccessToken, addBloodDonation);
+hospitalRouter
     .route('/giveBloodDonation')
     .post(verifyAccessToken, giveBloodDonation);
+hospitalRouter
+    .route('/getEmergency')
+    .get(verifyAccessToken, getEmergenciesByHospital);
 
-export default authRouter;
+export default hospitalRouter;

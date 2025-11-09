@@ -4,6 +4,8 @@ import BloodDonation from '../../models/bloodDonation.model.js';
 import BloodReceiver from '../../models/bloodReceiver.model.js';
 import Hospital from '../../models/hospital.model.js';
 import User from '../../models/user.model.js';
+import Emergency from '../../models/emergency.model.js';
+
 
 const addBloodDonation = asyncHandler(async (req, res) => {
     const {donorId, quantity} = req.body;
@@ -125,4 +127,60 @@ const giveBloodDonation = asyncHandler(async (req, res) => {
     );
 });
 
-export {addBloodDonation, giveBloodDonation};
+const getEmergenciesByHospital = asyncHandler(async (req, res) => {
+    const hospitalId = req.userId;
+
+    const hospital = await Hospital.findById(hospitalId);
+    if (!hospital) {
+        throw new ApiError(statusCode.NOT_FOUND, 'Hospital not found');
+    }
+
+    const emergencies = await Emergency.find({
+        pinCode: hospital?.pinCode,
+    })
+        .sort({ createdAt: -1 })
+        .populate('user', 'name phoneNumber bloodType')
+        .lean();
+
+    return res.status(statusCode.OK).json(
+        new ApiResponse(
+            statusCode.OK,
+            `Fetched ${emergencies.length} emergencies for pinCode ${hospital.pinCode}`,
+            emergencies
+        )
+    );
+});
+
+const getEmergencyById = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const hospitalId = req.userId;
+
+    const hospital = await Hospital.findById(hospitalId);
+    if (!hospital) {
+        throw new ApiError(statusCode.NOT_FOUND, 'Hospital not found');
+    }
+
+    const emergency = await Emergency.findById(id)
+        .populate('user', 'name phoneNumber bloodType')
+        .lean();
+
+    if (!emergency) {
+        throw new ApiError(statusCode.NOT_FOUND, 'Emergency not found');
+    }
+
+    if (emergency.pinCode !== hospital.pinCode) {
+        throw new ApiError(statusCode.FORBIDDEN, 'Access denied for this emergency');
+    }
+
+    return res
+        .status(statusCode.OK)
+        .json(
+            new ApiResponse(
+                statusCode.OK,
+                'Fetched emergency details successfully',
+                emergency
+            )
+        );
+});
+
+export {addBloodDonation, giveBloodDonation, getEmergenciesByHospital, getEmergencyById};
