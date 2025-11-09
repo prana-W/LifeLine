@@ -10,6 +10,7 @@ import BloodDonationUserPage from './pages/User/BloodDonationUserPage.jsx';
 
 import {createBrowserRouter, RouterProvider} from 'react-router-dom';
 import PharmacyAuth from './pages/Pharmacy/PharmacyAuth.jsx';
+import PinCodeFinder from "@/components/emergency.jsx";
 
 const router = createBrowserRouter([
     {
@@ -55,7 +56,7 @@ const router = createBrowserRouter([
             {
                 path: '*',
                 element: <NotFound />,
-            },
+            }
         ],
     },
 ]);
