@@ -5,6 +5,7 @@ const medicineSchema = new mongoose.Schema(
         name: {
             type: String,
             required: true,
+            unique: true,
             index: true // Todo: idk what it does actually
         },
         quantity: {

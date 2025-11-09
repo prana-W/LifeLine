@@ -29,7 +29,7 @@ const updateMedicine = asyncHandler(async (req, res) => {
     const pharmacyId = req?.userId;
 
     const { medicineId } = req?.params;
-    const { name, quantity, price } = req?.body;
+    const { delta } = req?.body;
 
     const medicine = await Medicine.findOne({
         _id: medicineId,
@@ -43,9 +43,7 @@ const updateMedicine = asyncHandler(async (req, res) => {
         );
     }
 
-    if (name !== undefined) medicine.name = name;
-    if (quantity !== undefined) medicine.quantity = quantity;
-    if (price !== undefined) medicine.price = price;
+    if (delta !== undefined) medicine.quantity = medicine?.quantity + delta;
 
     await medicine.save();
 

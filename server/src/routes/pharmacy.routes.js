@@ -8,6 +8,7 @@ const pharmacy = Router();
 
 pharmacy.route('/getAllMedicines').get(verifyAccessToken, getAllMedicines);
 pharmacy.route('/addNewMedicine').post(verifyAccessToken, addMedicine);
-pharmacy.route('/updateMedicine').post(verifyAccessToken, updateMedicine);
+pharmacy.route('/updateMedicine/:medicineId').put(verifyAccessToken, updateMedicine);
+pharmacy.route('/deleteMedicine/:medicineId').delete(verifyAccessToken, deleteMedicine);
 
 export default pharmacy;
