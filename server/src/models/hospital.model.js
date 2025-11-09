@@ -1,19 +1,22 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
-import { ApiError } from '../utility/index.js';
+import {ApiError} from '../utility/index.js';
 import statusCode from '../constants/statusCode.js';
 import jwt from 'jsonwebtoken';
 
-const bloodInventorySchema = new mongoose.Schema({
-    'A+': { type: Number, default: 0 },
-    'A-': { type: Number, default: 0 },
-    'B+': { type: Number, default: 0 },
-    'B-': { type: Number, default: 0 },
-    'AB+': { type: Number, default: 0 },
-    'AB-': { type: Number, default: 0 },
-    'O+': { type: Number, default: 0 },
-    'O-': { type: Number, default: 0 },
-}, { _id: false });
+const bloodInventorySchema = new mongoose.Schema(
+    {
+        'A+': {type: Number, default: 0},
+        'A-': {type: Number, default: 0},
+        'B+': {type: Number, default: 0},
+        'B-': {type: Number, default: 0},
+        'AB+': {type: Number, default: 0},
+        'AB-': {type: Number, default: 0},
+        'O+': {type: Number, default: 0},
+        'O-': {type: Number, default: 0},
+    },
+    {_id: false}
+);
 
 const hospitalSchema = new mongoose.Schema({
     name: {

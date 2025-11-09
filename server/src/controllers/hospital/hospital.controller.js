@@ -1,4 +1,4 @@
-import { ApiError, ApiResponse, asyncHandler } from '../../utility/index.js';
+import {ApiError, ApiResponse, asyncHandler} from '../../utility/index.js';
 import statusCode from '../../constants/statusCode.js';
 import BloodDonation from '../../models/bloodDonation.model.js';
 import BloodReceiver from '../../models/bloodReceiver.model.js';
@@ -6,7 +6,7 @@ import Hospital from '../../models/hospital.model.js';
 import User from '../../models/user.model.js';
 
 const addBloodDonation = asyncHandler(async (req, res) => {
-    const { donorId, quantity } = req.body;
+    const {donorId, quantity} = req.body;
 
     if (!donorId || !quantity) {
         throw new ApiError(statusCode.BAD_REQUEST, 'All fields are required!');
@@ -14,7 +14,10 @@ const addBloodDonation = asyncHandler(async (req, res) => {
 
     const hospitalId = req.userId; // Authenticated hospital ID
     if (!hospitalId) {
-        throw new ApiError(statusCode.UNAUTHORIZED, 'Hospital not authenticated!');
+        throw new ApiError(
+            statusCode.UNAUTHORIZED,
+            'Hospital not authenticated!'
+        );
     }
 
     const hospital = await Hospital.findById(hospitalId);
@@ -60,7 +63,7 @@ const addBloodDonation = asyncHandler(async (req, res) => {
 });
 
 const giveBloodDonation = asyncHandler(async (req, res) => {
-    const { receiverId, quantity } = req.body;
+    const {receiverId, quantity} = req.body;
 
     if (!receiverId || !quantity) {
         throw new ApiError(statusCode.BAD_REQUEST, 'All fields are required!');
@@ -68,7 +71,10 @@ const giveBloodDonation = asyncHandler(async (req, res) => {
 
     const hospitalId = req.userId;
     if (!hospitalId) {
-        throw new ApiError(statusCode.UNAUTHORIZED, 'Hospital not authenticated!');
+        throw new ApiError(
+            statusCode.UNAUTHORIZED,
+            'Hospital not authenticated!'
+        );
     }
 
     const hospital = await Hospital.findById(hospitalId);
@@ -119,4 +125,4 @@ const giveBloodDonation = asyncHandler(async (req, res) => {
     );
 });
 
-export { addBloodDonation, giveBloodDonation };
+export {addBloodDonation, giveBloodDonation};
