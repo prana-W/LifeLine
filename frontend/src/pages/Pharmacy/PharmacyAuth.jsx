@@ -1,12 +1,4 @@
 import React, { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -19,12 +11,62 @@ import {
   Clipboard,
   MapPin,
   Navigation,
+  Pill,
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
-import useApi  from "@/hooks/useApi";   // your hook
+import useApi from "@/hooks/useApi";
 import { toast } from "sonner";
 
+// ---------------------- PHARMACY SVG -------------------------
+function PharmacyIllustration() {
+  return (
+    <svg viewBox="0 0 500 600" className="w-full h-full">
+      {/* Shelf */}
+      <rect x="120" y="250" width="260" height="20" fill="#B8A8FF" opacity="0.4" rx="4" />
+
+      {/* Pill Bottles */}
+      <g>
+        <rect x="150" y="180" width="60" height="70" fill="#C8F4E5" rx="6" />
+        <rect x="160" y="190" width="40" height="20" fill="#58C09A" rx="4" />
+
+        <rect x="240" y="170" width="55" height="80" fill="#B8A8FF" rx="6" />
+        <rect x="250" y="180" width="35" height="20" fill="#7A67C7" rx="4" />
+
+        <rect x="325" y="190" width="60" height="60" fill="#C8F4E5" rx="6" />
+        <rect x="335" y="200" width="40" height="18" fill="#58C09A" rx="4" />
+      </g>
+
+      {/* Big Pill */}
+      <g opacity="0.8">
+        <ellipse cx="130" cy="430" rx="50" ry="25" fill="#B8A8FF" transform="rotate(-20 130 430)" />
+        <ellipse cx="165" cy="410" rx="50" ry="25" fill="#C8F4E5" transform="rotate(-20 165 410)" />
+      </g>
+
+      {/* Pharmacist */}
+      <g>
+        <circle cx="260" cy="450" r="35" fill="#C8F4E5" />
+        <rect x="225" y="480" width="70" height="90" fill="#7A67C7" rx="10" />
+        <rect x="205" y="505" width="25" height="60" fill="#B8A8FF" rx="6" />
+        <rect x="305" y="505" width="25" height="60" fill="#B8A8FF" rx="6" />
+      </g>
+
+      {/* Floating Particles */}
+      {[...Array(9)].map((_, i) => (
+        <circle
+          key={i}
+          cx={60 + i * 45}
+          cy={100 + (i % 3) * 120}
+          r="3.5"
+          fill="#B8A8FF"
+          opacity="0.35"
+        />
+      ))}
+    </svg>
+  );
+}
+
+// MAIN COMPONENT
 export default function PharmacyAuth() {
   const navigate = useNavigate();
   const api = useApi();
@@ -49,16 +91,13 @@ export default function PharmacyAuth() {
     location: "",
   });
 
-  // ---------------- LOGIN ----------------
+  // LOGIN
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setMessage({ type: "", text: "" });
     setLoading(true);
 
-    console.log(loginForm);
-    
-
-    const { success, message: apiMsg, data } = await api.post(
+    const { success, message: apiMsg } = await api.post(
       "/pharmacy/auth/login",
       loginForm
     );
@@ -66,18 +105,17 @@ export default function PharmacyAuth() {
     setLoading(false);
 
     if (success) {
-      toast.success(apiMsg || "Login successful");
+      toast.success(apiMsg);
       localStorage.setItem("role", "pharmacy");
       window.location.href = "/";
     } else {
-      setMessage({ type: "error", text: apiMsg || "Login failed" });
+      setMessage({ type: "error", text: apiMsg });
     }
   };
 
-  // ---------------- SIGNUP ----------------
+  // SIGNUP
   const handleSignupSubmit = async (e) => {
     e.preventDefault();
-    setMessage({ type: "", text: "" });
 
     if (signupForm.password !== signupForm.confirmPassword) {
       setMessage({ type: "error", text: "Passwords do not match!" });
@@ -89,7 +127,7 @@ export default function PharmacyAuth() {
     const payload = { ...signupForm };
     delete payload.confirmPassword;
 
-    const { success, message: apiMsg, data } = await api.post(
+    const { success, message: apiMsg } = await api.post(
       "/pharmacy/auth/signup",
       payload
     );
@@ -97,312 +135,323 @@ export default function PharmacyAuth() {
     setLoading(false);
 
     if (success) {
-      setMessage({ type: "success", text: apiMsg || "Registered successfully" });
+      setMessage({ type: "success", text: apiMsg });
       setTimeout(() => setIsLogin(true), 1500);
     } else {
-      setMessage({ type: "error", text: apiMsg || "Registration failed" });
+      setMessage({ type: "error", text: apiMsg });
     }
   };
 
-  // ---------------------------------------------------------------
   return (
-    <div
-      className="min-h-screen relative flex items-center justify-center p-4"
-      style={{ backgroundColor: "#F2F2F2" }}
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-blue-600 via-mint-600 to-mint-600"
+      style={{
+        background: "linear-gradient(135deg, #D8C4FF, #BFA6FF, #A78FFF, #957AFF)",
+      }}
     >
-      {/* Background Grid */}
+      {/* ANIMATIONS */}
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-18px); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0px); }
+        }
+        .animate-float { animation: float 3.5s ease-in-out infinite; }
+        .animate-fadeIn { animation: fadeIn 0.8s ease-out; }
+      `}</style>
+
+      {/* Floating Circles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <svg width="100%" height="100%">
-          <defs>
-            <pattern id="grid" width="30" height="40" patternUnits="userSpaceOnUse">
-              <path
-                d="M 40 0 L 0 0 0 40"
-                fill="none"
-                stroke="rgba(74,144,226,0.1)"
-                strokeWidth="1.5"
-              />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-        </svg>
+        <div className="absolute top-16 left-24 w-32 h-32 bg-white rounded-full opacity-10 animate-float"></div>
+        <div className="absolute bottom-20 right-32 w-40 h-40 bg-lavender-300 rounded-full opacity-10 animate-float" style={{ animationDelay: "1s" }}></div>
+        <div className="absolute top-1/2 left-10 w-24 h-24 bg-mint-200 rounded-full opacity-10 animate-float" style={{ animationDelay: "2s" }}></div>
       </div>
 
-      <Card className="w-full max-w-2xl shadow-2xl border-none bg-white relative z-10">
-        <CardHeader className="space-y-3 pb-6">
-          <div className="flex justify-center">
-            <div
-              className="p-4 rounded-full hover:scale-110 transition-transform"
-              style={{ backgroundColor: "#9b59b6" }}
-            >
-              <Store className="w-10 h-10 text-white" />
+      {/* MAIN CONTAINER */}
+      <div className="min-h-screen flex items-center justify-center p-4 lg:p-8">
+        <div className="relative w-full max-w-7xl h-[630px] lg:h-[700px] animate-fadeIn">
+
+          {/* LEFT PANEL */}
+          <div className="absolute inset-0 lg:left-0 lg:right-1/2">
+            <div className="relative w-full h-full bg-white rounded-3xl lg:rounded-r-none overflow-hidden shadow-2xl">
+
+              {/* Curved Divider */}
+              <svg
+                className="hidden lg:block absolute right-0 top-0 h-full w-32 z-20"
+                viewBox="0 0 100 700"
+                preserveAspectRatio="none"
+              >
+                <path d="M 0 0 Q 80 350 0 700 L 0 700 L 0 0 Z" fill="white" />
+              </svg>
+
+              {/* Background Pattern */}
+              <div className="absolute inset-0 opacity-5">
+                <div
+                  className="h-full w-full"
+                  style={{
+                    backgroundImage: `linear-gradient(#B8A8FF 1px, transparent 1px),
+                                     linear-gradient(90deg, #B8A8FF 1px, transparent 1px)`,
+                    backgroundSize: "40px 40px",
+                  }}
+                ></div>
+              </div>
+
+              {/* Logo */}
+              <div className="absolute top-8 left-8 z-10 flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-[#C8F4E5] to-[#A692F8] rounded-full flex items-center justify-center">
+                  <Pill className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-[#7A67C7]">MediBridge</h1>
+                  <p className="text-xs text-gray-500">Pharmacy Portal</p>
+                </div>
+              </div>
+
+              {/* Illustration */}
+              <div className="hidden lg:flex items-center justify-center h-full px-12">
+                <div className="max-w-md animate-float">
+                  <PharmacyIllustration />
+                </div>
+              </div>
+
+              {/* Decorative circles */}
+              <div className="absolute bottom-20 left-20 w-20 h-20 bg-[#C8F4E5] rounded-full opacity-20"></div>
+              <div className="absolute top-32 right-32 w-16 h-16 bg-[#B8A8FF] rounded-full opacity-20"></div>
+
+              {/* Footer */}
+              <div className="absolute bottom-8 left-8 text-xs text-gray-400">
+                <p>© 2024 MediBridge Pharmacy Portal</p>
+                <p>Powered by HealthTech</p>
+              </div>
             </div>
           </div>
 
-          <CardTitle className="text-3xl text-center font-bold" style={{ color: "#333" }}>
-            {isLogin ? "Pharmacy Login" : "Pharmacy Registration"}
-          </CardTitle>
+          {/* RIGHT PANEL */}
+          <div className="absolute inset-0 lg:left-1/2 lg:right-0">
+            <div className="relative w-full h-full bg-gradient-to-br from-[#C8F4E5] to-[#B8A8FF] rounded-3xl lg:rounded-l-none overflow-hidden shadow-2xl">
 
-          <CardDescription
-            className="text-center text-base"
-            style={{ color: "#333", opacity: 0.7 }}
-          >
-            {isLogin
-              ? "Access your pharmacy dashboard"
-              : "Register your pharmacy to continue"}
-          </CardDescription>
-        </CardHeader>
-
-        <CardContent>
-          {message.text && (
-            <Alert
-              className={`mb-6 border-none ${
-                message.type === "success" ? "bg-green-50" : "bg-red-50"
-              }`}
-            >
-              <AlertDescription
-                className={`font-medium ${
-                  message.type === "success" ? "text-green-700" : "text-red-700"
-                }`}
-              >
-                {message.text}
-              </AlertDescription>
-            </Alert>
-          )}
-
-          {isLogin ? (
-            /* ---------------------------------- LOGIN FORM ---------------------------------- */
-            <div className="space-y-5">
-              {/* Phone */}
-              <div className="space-y-2 text-black">
-                <Label>
-                  Phone Number <span className="text-red-600">*</span>
-                </Label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-3 h-5 w-5 text-purple-600" />
-                  <Input
-                    placeholder="Enter phone number"
-                    className="pl-10 py-6"
-                    value={loginForm.phoneNumber}
-                    onChange={(e) =>
-                      setLoginForm({ ...loginForm, phoneNumber: e.target.value })
-                    }
-                  />
-                </div>
+              {/* Background grid */}
+              <div className="absolute inset-0 opacity-5">
+                <div
+                  className="h-full w-full"
+                  style={{
+                    backgroundImage: `linear-gradient(white 1px, transparent 1px),
+                                     linear-gradient(90deg, white 1px, transparent 1px)`,
+                    backgroundSize: "30px 30px",
+                  }}
+                ></div>
               </div>
 
-              {/* Password */}
-              <div className="space-y-2 text-black">
-                <Label>
-                  Password <span className="text-red-600">*</span>
-                </Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-5 w-5 text-purple-600" />
-                  <Input
-                    type="password"
-                    placeholder="••••••••"
-                    className="pl-10 py-6"
-                    value={loginForm.password}
-                    onChange={(e) =>
-                      setLoginForm({ ...loginForm, password: e.target.value })
-                    }
-                  />
+              {/* FORM */}
+              <div className="relative h-full flex items-center justify-center p-8 lg:p-12">
+                <div className="w-full max-w-md bg-white/30 backdrop-blur-xl rounded-2xl p-8 shadow-xl">
+
+                  {/* Header */}
+                  <div className="text-center mb-8">
+                    <div className="inline-block p-4 bg-white/20 rounded-2xl mb-4">
+                      <Store className="w-10 h-10 text-[#7A67C7]" />
+                    </div>
+
+                    <h2 className="text-4xl font-bold text-violet-500">
+                      {isLogin ? "Login" : "Register"}
+                    </h2>
+                    <p className="text-violet-500 text-sm">
+                      {isLogin ? "Access your pharmacy account" : "Create your pharmacy account"}
+                    </p>
+                  </div>
+
+                  {/* Alert */}
+                  {message.text && (
+                    <Alert
+                      className={`mb-4 border-none ${
+                        message.type === "success"
+                          ? "bg-green-500/20 text-white"
+                          : "bg-red-500/20 text-white"
+                      }`}
+                    >
+                      <AlertDescription>{message.text}</AlertDescription>
+                    </Alert>
+                  )}
+
+                  {/* LOGIN FORM */}
+                  {isLogin ? (
+                    <form className="space-y-4" onSubmit={handleLoginSubmit}>
+                      <div>
+                        <Label className="text-violet-500 mb-1.5">Phone Number</Label>
+                        <div className="relative">
+                          <Phone className="absolute left-3 top-3 text-violet-500/70" />
+                          <Input
+                            className="pl-10 bg-white/20 border-white/30 text-white placeholder:text-white/60"
+                            value={loginForm.phoneNumber}
+                            onChange={(e) =>
+                              setLoginForm({ ...loginForm, phoneNumber: e.target.value })
+                            }
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label className="text-violet-500 mb-1.5">Password</Label>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-3 text-violet-500/70" />
+                          <Input
+                            type="password"
+                            className="pl-10 bg-white/20 border-white/30 text-white placeholder:text-white/60"
+                            value={loginForm.password}
+                            onChange={(e) =>
+                              setLoginForm({ ...loginForm, password: e.target.value })
+                            }
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <Button
+                        className="w-full bg-[#7A67C7] hover:bg-[#6a58b0] text-white h-12 rounded-xl shadow-lg transition-all"
+                        disabled={loading}
+                      >
+                        {loading ? "Logging in..." : "Login"}
+                      </Button>
+                    </form>
+                  ) : (
+                    // SIGNUP FORM
+                    <form className="space-y-3" onSubmit={handleSignupSubmit}>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-violet-500 mb-1.5">Shop Name</Label>
+                          <Input
+                            className="bg-white/20 border-white/30 text-black"
+                            value={signupForm.shopName}
+                            onChange={(e) =>
+                              setSignupForm({ ...signupForm, shopName: e.target.value })
+                            }
+                          />
+                        </div>
+
+                        <div>
+                          <Label className="text-violet-500 mb-1.5">Owner Name</Label>
+                          <Input
+                            className="bg-white/20 border-white/30 text-black"
+                            value={signupForm.ownerName}
+                            onChange={(e) =>
+                              setSignupForm({ ...signupForm, ownerName: e.target.value })
+                            }
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label className="text-violet-500 mb-1.5">Phone Number *</Label>
+                        <Input
+                          className="bg-white/20 border-white/30 text-black"
+                          value={signupForm.phoneNumber}
+                          onChange={(e) =>
+                            setSignupForm({ ...signupForm, phoneNumber: e.target.value })
+                          }
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <Label className="text-violet-500 mb-1.5">License Number *</Label>
+                        <Input
+                          className="bg-white/20 border-white/30 text-black"
+                          value={signupForm.licenseNumber}
+                          onChange={(e) =>
+                            setSignupForm({ ...signupForm, licenseNumber: e.target.value })
+                          }
+                          required
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-violet-500 mb-1.5">Pin Code *</Label>
+                          <Input
+                            className="bg-white/20 border-white/30 text-black"
+                            value={signupForm.pinCode}
+                            onChange={(e) =>
+                              setSignupForm({ ...signupForm, pinCode: e.target.value })
+                            }
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <Label className="text-violet-500 mb-1.5">Location</Label>
+                          <Input
+                            className="bg-white/20 border-white/30 text-black"
+                            value={signupForm.location}
+                            onChange={(e) =>
+                              setSignupForm({ ...signupForm, location: e.target.value })
+                            }
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-violet-500 mb-1.5">Password *</Label>
+                          <Input
+                            type="password"
+                            className="bg-white/20 border-white/30 text-black"
+                            value={signupForm.password}
+                            onChange={(e) =>
+                              setSignupForm({ ...signupForm, password: e.target.value })
+                            }
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <Label className="text-violet-500 mb-1.5">Confirm *</Label>
+                          <Input
+                            type="password"
+                            className="bg-white/20 border-white/30 text-black"
+                            value={signupForm.confirmPassword}
+                            onChange={(e) =>
+                              setSignupForm({
+                                ...signupForm,
+                                confirmPassword: e.target.value,
+                              })
+                            }
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <Button
+                        className="w-full bg-[#7A67C7] hover:bg-[#6a58b0] text-white h-12 rounded-xl shadow-lg"
+                        disabled={loading}
+                      >
+                        {loading ? "Creating..." : "Create Account"}
+                      </Button>
+                    </form>
+                  )}
+
+                  {/* Toggle */}
+                  <p className="text-center text-violet-500 mt-6">
+                    {isLogin ? "Don't have an account?" : "Already registered?"}{" "}
+                    <button
+                      className="text-violet-500 font-semibold hover:underline"
+                      onClick={() => {
+                        setIsLogin(!isLogin);
+                        setMessage({ type: "", text: "" });
+                      }}
+                    >
+                      {isLogin ? "Register" : "Login"}
+                    </button>
+                  </p>
                 </div>
               </div>
-
-              <Button
-                onClick={handleLoginSubmit}
-                className="w-full text-white py-6 font-semibold"
-                style={{ backgroundColor: "#9b59b6" }}
-                disabled={loading}
-              >
-                {loading ? "Logging in..." : "Login"}
-              </Button>
             </div>
-          ) : (
-            /* ---------------------------------- SIGNUP FORM ---------------------------------- */
-            <div className="space-y-5">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                {/* shopName optional */}
-                <div className="space-y-2 text-black">
-                  <Label>Shop Name</Label>
-                  <div className="relative">
-                    <Store className="absolute left-3 top-3 h-5 w-5 text-purple-600" />
-                    <Input
-                      placeholder="Medico Plus Store"
-                      className="pl-10 py-6"
-                      value={signupForm.shopName}
-                      onChange={(e) =>
-                        setSignupForm({ ...signupForm, shopName: e.target.value })
-                      }
-                    /> 
-                  </div>
-                </div>
-
-                {/* ownerName optional */}
-                <div className="space-y-2 text-black">
-                  <Label>Owner Name</Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-3 h-5 w-5 text-purple-600" />
-                    <Input
-                      placeholder="Rahul Sharma"
-                      className="pl-10 py-6"
-                      value={signupForm.ownerName}
-                      onChange={(e) =>
-                        setSignupForm({ ...signupForm, ownerName: e.target.value })
-                      }
-                    />
-                  </div>
-                </div>
-
-                {/* phoneNumber required */}
-                <div className="space-y-2 text-black">
-                  <Label>
-                    Phone Number <span className="text-red-600">*</span>
-                  </Label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-3 h-5 w-5 text-purple-600" />
-                    <Input
-                      placeholder="9876543210"
-                      className="pl-10 py-6"
-                      value={signupForm.phoneNumber}
-                      onChange={(e) =>
-                        setSignupForm({
-                          ...signupForm,
-                          phoneNumber: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                </div>
-
-                {/* licenseNumber required */}
-                <div className="space-y-2 text-black">
-                  <Label>
-                    License Number <span className="text-red-600">*</span>
-                  </Label>
-                  <div className="relative">
-                    <Clipboard className="absolute left-3 top-3 h-5 w-5 text-purple-600" />
-                    <Input
-                      placeholder="PHAR123456"
-                      className="pl-10 py-6"
-                      value={signupForm.licenseNumber}
-                      onChange={(e) =>
-                        setSignupForm({
-                          ...signupForm,
-                          licenseNumber: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                </div>
-
-                {/* pinCode required */}
-                <div className="space-y-2 text-black">
-                  <Label>
-                    Pin Code <span className="text-red-600">*</span>
-                  </Label>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-3 h-5 w-5 text-purple-600" />
-                    <Input
-                      placeholder="400001"
-                      className="pl-10 py-6"
-                      value={signupForm.pinCode}
-                      onChange={(e) =>
-                        setSignupForm({ ...signupForm, pinCode: e.target.value })
-                      }
-                    />
-                  </div>
-                </div>
-
-                {/* location optional */}
-                <div className="space-y-2 text-black">
-                  <Label>Location</Label>
-                  <div className="relative">
-                    <Navigation className="absolute left-3 top-3 h-5 w-5 text-purple-600" />
-                    <Input
-                      placeholder="Near Apollo Hospital"
-                      className="pl-10 py-6"
-                      value={signupForm.location}
-                      onChange={(e) =>
-                        setSignupForm({ ...signupForm, location: e.target.value })
-                      }
-                    />
-                  </div>
-                </div>
-
-                {/* password */}
-                <div className="space-y-2 text-black">
-                  <Label>
-                    Password <span className="text-red-600">*</span>
-                  </Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-5 w-5 text-purple-600" />
-                    <Input
-                      type="password"
-                      placeholder="••••••••"
-                      className="pl-10 py-6"
-                      value={signupForm.password}
-                      onChange={(e) =>
-                        setSignupForm({ ...signupForm, password: e.target.value })
-                      }
-                      minLength={6}
-                    />
-                  </div>
-                </div>
-
-                {/* confirm password */}
-                <div className="space-y-2 text-black">
-                  <Label>
-                    Confirm Password <span className="text-red-600">*</span>
-                  </Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-5 w-5 text-purple-600" />
-                    <Input
-                      type="password"
-                      placeholder="••••••••"
-                      className="pl-10 py-6"
-                      value={signupForm.confirmPassword}
-                      onChange={(e) =>
-                        setSignupForm({
-                          ...signupForm,
-                          confirmPassword: e.target.value,
-                        })
-                      }
-                      minLength={6}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <Button
-                onClick={handleSignupSubmit}
-                className="w-full py-6 text-white font-semibold"
-                style={{ backgroundColor: "#9b59b6" }}
-                disabled={loading}
-              >
-                {loading ? "Creating Account..." : "Create Account"}
-              </Button>
-            </div>
-          )}
-        </CardContent>
-
-        <CardFooter>
-          <div className="w-full text-center text-sm" style={{ color: "#333", opacity: 0.7 }}>
-            {isLogin ? "Don't have an account? " : "Already registered? "}
-            <button
-              className="font-semibold hover:underline"
-              style={{ color: "#9b59b6" }}
-              onClick={() => {
-                setIsLogin(!isLogin);
-                setMessage({ type: "", text: "" });
-              }}
-            >
-              {isLogin ? "Sign up" : "Login"}
-            </button>
           </div>
-        </CardFooter>
-      </Card>
+
+        </div>
+      </div>
     </div>
   );
 }
