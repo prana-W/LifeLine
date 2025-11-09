@@ -173,7 +173,7 @@ export default function PharmacyAuth() {
             /* ---------------------------------- LOGIN FORM ---------------------------------- */
             <div className="space-y-5">
               {/* Phone */}
-              <div className="space-y-2">
+              <div className="space-y-2 text-black">
                 <Label>
                   Phone Number <span className="text-red-600">*</span>
                 </Label>
@@ -191,7 +191,7 @@ export default function PharmacyAuth() {
               </div>
 
               {/* Password */}
-              <div className="space-y-2">
+              <div className="space-y-2 text-black">
                 <Label>
                   Password <span className="text-red-600">*</span>
                 </Label>
@@ -224,7 +224,7 @@ export default function PharmacyAuth() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                 {/* shopName optional */}
-                <div className="space-y-2">
+                <div className="space-y-2 text-black">
                   <Label>Shop Name</Label>
                   <div className="relative">
                     <Store className="absolute left-3 top-3 h-5 w-5 text-purple-600" />
@@ -235,12 +235,12 @@ export default function PharmacyAuth() {
                       onChange={(e) =>
                         setSignupForm({ ...signupForm, shopName: e.target.value })
                       }
-                    />
+                    /> 
                   </div>
                 </div>
 
                 {/* ownerName optional */}
-                <div className="space-y-2">
+                <div className="space-y-2 text-black">
                   <Label>Owner Name</Label>
                   <div className="relative">
                     <User className="absolute left-3 top-3 h-5 w-5 text-purple-600" />
@@ -256,7 +256,7 @@ export default function PharmacyAuth() {
                 </div>
 
                 {/* phoneNumber required */}
-                <div className="space-y-2">
+                <div className="space-y-2 text-black">
                   <Label>
                     Phone Number <span className="text-red-600">*</span>
                   </Label>
@@ -277,7 +277,7 @@ export default function PharmacyAuth() {
                 </div>
 
                 {/* licenseNumber required */}
-                <div className="space-y-2">
+                <div className="space-y-2 text-black">
                   <Label>
                     License Number <span className="text-red-600">*</span>
                   </Label>
@@ -298,7 +298,7 @@ export default function PharmacyAuth() {
                 </div>
 
                 {/* pinCode required */}
-                <div className="space-y-2">
+                <div className="space-y-2 text-black">
                   <Label>
                     Pin Code <span className="text-red-600">*</span>
                   </Label>
@@ -316,7 +316,7 @@ export default function PharmacyAuth() {
                 </div>
 
                 {/* location optional */}
-                <div className="space-y-2">
+                <div className="space-y-2 text-black">
                   <Label>Location</Label>
                   <div className="relative">
                     <Navigation className="absolute left-3 top-3 h-5 w-5 text-purple-600" />
@@ -332,7 +332,7 @@ export default function PharmacyAuth() {
                 </div>
 
                 {/* password */}
-                <div className="space-y-2">
+                <div className="space-y-2 text-black">
                   <Label>
                     Password <span className="text-red-600">*</span>
                   </Label>
@@ -352,7 +352,7 @@ export default function PharmacyAuth() {
                 </div>
 
                 {/* confirm password */}
-                <div className="space-y-2">
+                <div className="space-y-2 text-black">
                   <Label>
                     Confirm Password <span className="text-red-600">*</span>
                   </Label>
