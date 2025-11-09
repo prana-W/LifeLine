@@ -4,7 +4,6 @@ import {
   CardHeader,
   CardDescription,
   CardContent,
-  CardFooter,
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,10 +13,11 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Phone, User, MapPin, Droplet, Locate } from "lucide-react";
 import { toast } from "sonner";
 import FancySearchBar from "../../components/general/SearchBar";
-
-const API_BASE_URL = import.meta.env.VITE_SERVER_URL;
+import useApi from "@/hooks/useApi";
 
 export default function BloodDonation() {
+  const api = useApi();
+
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -26,7 +26,7 @@ export default function BloodDonation() {
 
   const [message, setMessage] = useState({ type: "", text: "" });
 
-  // ---------------- FETCH USER ----------------
+  // ---------------- FETCH USER (GET) ----------------
   const handleFetchUser = async () => {
     if (!phone.trim()) return;
 
@@ -34,60 +34,57 @@ export default function BloodDonation() {
     setMessage({ type: "", text: "" });
 
     try {
-      const res = await fetch(`${API_BASE_URL}/user/${phone}`);
-      const data = await res.json();
+      const { success, data, message } = await api.get(`/user/${phone}`);
 
-      if (res.ok) {
-        setUser(data.data);
+      if (success) {
+        setUser(data);
         toast.success("User found!");
       } else {
         setUser(null);
-        setMessage({ type: "error", text: data.message || "User not found!" });
+        setMessage({ type: "error", text: message || "User not found!" });
       }
-    } catch (err) {
-      setMessage({ type: "error", text: "Network error, try again." });
+    } catch {
+      setMessage({ type: "error", text: "Network error. Try again." });
     } finally {
       setLoading(false);
     }
   };
 
-  // ---------------- SUBMIT DONATION ----------------
+  // ---------------- SUBMIT DONATION (POST) ----------------
   const handleDonationSubmit = async () => {
     if (!quantity.trim()) {
-      toast.error("Enter quantity!");
+      toast.error("Please enter quantity!");
       return;
     }
 
-    const body = {
-      userId: user._id,
+    const payload = {
+      donorId: user._id,
       quantity: Number(quantity),
     };
 
     try {
-      const res = await fetch(`${API_BASE_URL}/user/donated`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
+      const { success, message } = await api.post(
+        "/hospital/addBloodDonation",
+        payload
+      );
 
-      const data = await res.json();
-
-      if (res.ok) {
+      if (success) {
         toast.success("Donation recorded!");
         setQuantity("");
       } else {
-        toast.error(data.message || "Failed to save donation");
+        toast.error(message || "Failed to save donation");
       }
-    } catch (err) {
-      toast.error("Network error!");
+    } catch {
+      toast.error("Network error");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative p-6"
-         style={{ backgroundColor: "#dce8fb" }}>
-
-      {/* BLUE GRID PATTERN BACKGROUND */}
+    <div
+      className="min-h-screen flex items-center justify-center relative p-6"
+      style={{ backgroundColor: "#dce8fb" }}
+    >
+      {/* GRID BACKGROUND */}
       <div className="absolute inset-0 opacity-50 pointer-events-none">
         <svg width="100%" height="100%">
           <defs>
@@ -105,33 +102,36 @@ export default function BloodDonation() {
               />
             </pattern>
           </defs>
-
           <rect width="100%" height="100%" fill="url(#grid-blue)" />
         </svg>
       </div>
 
       {/* MAIN CARD */}
-      <Card className="max-w-2xl w-full shadow-2xl border-none relative z-10"
-            style={{
-              background:
-                "linear-gradient(135deg, rgba(240,244,255,0.9), rgba(225,235,255,0.85))",
-              backdropFilter: "blur(10px)",
-              borderRadius: "20px",
-            }}>
-        
+      <Card
+        className="max-w-2xl w-full shadow-2xl border-none relative z-10 p-4"
+        style={{
+          background:
+            "linear-gradient(135deg, rgba(240,244,255,0.9), rgba(225,235,255,0.85))",
+          backdropFilter: "blur(10px)",
+          borderRadius: "20px",
+        }}
+      >
         <CardHeader>
-          <CardTitle className="text-3xl font-bold text-center"
-                     style={{ color: "#244b8b" }}>
+          <CardTitle
+            className="text-3xl font-bold text-center"
+            style={{ color: "#244b8b" }}
+          >
             Blood Donation Entry
           </CardTitle>
-          <CardDescription className="text-center"
-                           style={{ color: "#3d5d96" }}>
+          <CardDescription
+            className="text-center"
+            style={{ color: "#3d5d96" }}
+          >
             Search user and update blood donation details
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-6">
-
           {/* ALERT */}
           {message.text && (
             <Alert
@@ -149,10 +149,9 @@ export default function BloodDonation() {
             </Alert>
           )}
 
-          {/* PHONE INPUT */}
+          {/* SEARCH INPUT */}
           <div className="space-y-2">
-            <Label className="font-semibold"
-                   style={{ color: "#244b8b" }}>
+            <Label className="font-semibold" style={{ color: "#244b8b" }}>
               Enter User Phone Number
             </Label>
 
@@ -168,8 +167,7 @@ export default function BloodDonation() {
           <Button
             className="w-full text-white py-3 text-lg shadow-md"
             style={{
-              background:
-                "linear-gradient(135deg, #6a8dff, #4a6cff)",
+              background: "linear-gradient(135deg, #6a8dff, #4a6cff)",
             }}
             onClick={handleFetchUser}
             disabled={loading}
@@ -200,27 +198,33 @@ export default function BloodDonation() {
               </CardHeader>
 
               <CardContent className="space-y-3 text-blue-900">
-
                 <div className="flex items-center gap-2">
                   <Phone className="h-5 w-5 text-blue-600" />
-                  <span><b>Phone:</b> {user.phoneNumber}</span>
+                  <span>
+                    <b>Phone:</b> {user.phoneNumber}
+                  </span>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <MapPin className="h-5 w-5 text-blue-600" />
-                  <span><b>Pin Code:</b> {user.pinCode}</span>
+                  <span>
+                    <b>Pin Code:</b> {user.pinCode}
+                  </span>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <Locate className="h-5 w-5 text-blue-600" />
-                  <span><b>Location:</b> {user.location || "Not Provided"}</span>
+                  <span>
+                    <b>Location:</b> {user.location || "Not Provided"}
+                  </span>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <Droplet className="h-5 w-5 text-red-500" />
-                  <span><b>Blood Type:</b> {user.bloodType}</span>
+                  <span>
+                    <b>Blood Type:</b> {user.bloodType}
+                  </span>
                 </div>
-
               </CardContent>
             </Card>
           )}
@@ -228,9 +232,10 @@ export default function BloodDonation() {
           {/* DONATION FORM */}
           {user && (
             <div className="mt-6 space-y-4">
-
-              <Label className="font-semibold flex items-center gap-2"
-                     style={{ color: "#244b8b" }}>
+              <Label
+                className="font-semibold flex items-center gap-2"
+                style={{ color: "#244b8b" }}
+              >
                 <Droplet className="h-5 w-5 text-red-500" />
                 Quantity Donated (ml)
               </Label>
@@ -240,8 +245,7 @@ export default function BloodDonation() {
                 className="py-6"
                 style={{
                   borderColor: "#bcd0ff",
-                  background:
-                    "linear-gradient(135deg, #e8f0ff, #dae8ff)",
+                  background: "linear-gradient(135deg, #e8f0ff, #dae8ff)",
                 }}
                 placeholder="Enter quantity"
                 value={quantity}
@@ -251,14 +255,12 @@ export default function BloodDonation() {
               <Button
                 className="w-full text-white py-3 text-lg shadow-md"
                 style={{
-                  background:
-                    "linear-gradient(135deg, #4fc476, #3da45e)",
+                  background: "linear-gradient(135deg, #4fc476, #3da45e)",
                 }}
                 onClick={handleDonationSubmit}
               >
                 Save Donation
               </Button>
-
             </div>
           )}
         </CardContent>
