@@ -62,7 +62,7 @@ userId
 
         const payload = {
             userId: user?._id,
-            email: user?.email,
+            phone: user?.phoneNumber,
             pinCode: user?.pinCode
         };
 

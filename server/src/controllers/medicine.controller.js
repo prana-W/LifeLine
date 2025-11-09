@@ -25,7 +25,9 @@ const addMedicine = asyncHandler(async (req, res) => {
 });
 
 const updateMedicine = asyncHandler(async (req, res) => {
+
     const pharmacyId = req?.userId;
+
     const { medicineId } = req?.params;
     const { name, quantity, price } = req?.body;
 
@@ -55,7 +57,7 @@ const updateMedicine = asyncHandler(async (req, res) => {
 });
 
 const getAllMedicines = asyncHandler(async (req, res) => {
-    const pharmacyId = req?.userId; // returns the phramacy id
+    const pharmacyId = req?.userId; // returns the pharmacy id
 
     const medicines = await Medicine.find({ pharmacy: pharmacyId }).sort({ name: 1 });
 
