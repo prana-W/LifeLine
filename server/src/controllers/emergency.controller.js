@@ -6,6 +6,7 @@ import multer from 'multer';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import User from "../models/user.model.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -200,4 +201,238 @@ const callAmbulance = asyncHandler(async (req, res) => {
     );
 });
 
-export { createEmergencyAlert, callAmbulance, upload };
+/**
+ * Request blood emergency
+ * POST /api/v1/user/blood-request
+ */
+const requestBloodEmergency = asyncHandler(async (req, res) => {
+
+    const userId = req.userId;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+        throw new ApiError(statusCode.BAD_REQUEST, 'User not found!');
+    }
+    
+    const {bloodType, name:patientName, pinCode, phoneNumber} = user;
+
+    console.log('Received blood request:', {
+        bloodType,
+        patientName
+    });
+
+    // Validate required fields
+    if (!bloodType || !pinCode) {
+        throw new ApiError(
+            statusCode.BAD_REQUEST,
+            'Blood type and location details are required'
+        );
+    }
+
+    if (!phoneNumber) {
+        throw new ApiError(statusCode.BAD_REQUEST, 'Contact number is required');
+    }
+
+    if (!patientName) {
+        throw new ApiError(statusCode.BAD_REQUEST, 'Patient name is required');
+    }
+
+    // Validate blood type
+    const validBloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+    if (!validBloodTypes.includes(bloodType)) {
+        throw new ApiError(
+            statusCode.BAD_REQUEST,
+            `Invalid blood type. Must be one of: ${validBloodTypes.join(', ')}`
+        );
+    }
+
+    const hospitals = await Hospital.find({ pinCode: pinCode });
+
+    // Create blood request emergency
+    const bloodRequest = await Emergency.create({
+        user: userId,
+        type: 'blood',
+        hospitalsNotified: hospitals.map((h) => h._id),
+        pinCode,
+        bloodRequest: {
+            bloodType,
+            patientName,
+            phoneNumber,
+        },
+        timestamp: new Date()
+    });
+
+    return res.status(statusCode.CREATED).json(
+        new ApiResponse(
+            statusCode.CREATED,
+            'Blood request was raised at all the nearby hospitals!'
+        )
+    );
+});
+
+/**
+ * Get blood request details
+ * GET /api/v1/user/blood-request/:requestId
+ */
+const getBloodRequestDetails = asyncHandler(async (req, res) => {
+    const { requestId } = req.params;
+    const userId = req.userId;
+
+    const bloodRequest = await Emergency.findOne({
+        _id: requestId,
+        user: userId,
+        type: 'blood'
+    })
+        .populate('user', 'name email')
+        .populate('hospitalsNotified', 'name address contact pinCode');
+
+    if (!bloodRequest) {
+        throw new ApiError(
+            statusCode.NOT_FOUND,
+            'Blood request not found or you do not have permission to view it'
+        );
+    }
+
+    return res.status(statusCode.OK).json(
+        new ApiResponse(
+            statusCode.OK,
+            'Blood request details retrieved successfully',
+            {
+                requestId: bloodRequest._id,
+                type: bloodRequest.type,
+                bloodType: bloodRequest.bloodRequest.bloodType,
+                unitsRequired: bloodRequest.bloodRequest.unitsRequired,
+                urgencyLevel: bloodRequest.bloodRequest.urgencyLevel,
+                patientName: bloodRequest.bloodRequest.patientName,
+                reason: bloodRequest.bloodRequest.reason,
+                contactNumber: bloodRequest.bloodRequest.contactNumber,
+                location: bloodRequest.location,
+                status: bloodRequest.status,
+                hospitalsNotified: bloodRequest.hospitalsNotified,
+                createdAt: bloodRequest.createdAt,
+                timestamp: bloodRequest.timestamp,
+                resolvedAt: bloodRequest.resolvedAt,
+            }
+        )
+    );
+});
+
+/**
+ * Get user's blood request history
+ * GET /api/v1/user/blood-requests
+ */
+const getMyBloodRequests = asyncHandler(async (req, res) => {
+    const userId = req.userId;
+    const { status } = req.query;
+
+    const query = {
+        user: userId,
+        type: 'blood'
+    };
+
+    if (status) {
+        query.status = status;
+    }
+
+    const bloodRequests = await Emergency.find(query)
+        .populate('hospitalsNotified', 'name address contact')
+        .sort({ createdAt: -1 });
+
+    const grouped = {
+        pending: bloodRequests.filter(r => r.status === 'pending'),
+        responding: bloodRequests.filter(r => r.status === 'responding'),
+        resolved: bloodRequests.filter(r => r.status === 'resolved'),
+        cancelled: bloodRequests.filter(r => r.status === 'cancelled'),
+    };
+
+    return res.status(statusCode.OK).json(
+        new ApiResponse(
+            statusCode.OK,
+            'Blood request history retrieved successfully',
+            {
+                totalRequests: bloodRequests.length,
+                summary: {
+                    pending: grouped.pending.length,
+                    responding: grouped.responding.length,
+                    resolved: grouped.resolved.length,
+                    cancelled: grouped.cancelled.length,
+                },
+                requests: bloodRequests.map(request => ({
+                    requestId: request._id,
+                    bloodType: request.bloodRequest.bloodType,
+                    unitsRequired: request.bloodRequest.unitsRequired,
+                    urgencyLevel: request.bloodRequest.urgencyLevel,
+                    patientName: request.bloodRequest.patientName,
+                    status: request.status,
+                    location: {
+                        pinCode: request.pinCode,
+                        address: request.location.address,
+                        city: request.location.city,
+                    },
+                    hospitalsNotified: request.hospitalsNotified.length,
+                    createdAt: request.createdAt,
+                    resolvedAt: request.resolvedAt,
+                }))
+            }
+        )
+    );
+});
+
+/**
+ * Cancel blood request
+ * PATCH /api/v1/user/blood-request/:requestId/cancel
+ */
+const cancelBloodRequest = asyncHandler(async (req, res) => {
+    const { requestId } = req.params;
+    const userId = req.userId;
+
+    const bloodRequest = await Emergency.findOne({
+        _id: requestId,
+        user: userId,
+        type: 'blood'
+    });
+
+    if (!bloodRequest) {
+        throw new ApiError(
+            statusCode.NOT_FOUND,
+            'Blood request not found or you do not have permission'
+        );
+    }
+
+    if (bloodRequest.status === 'resolved') {
+        throw new ApiError(
+            statusCode.CONFLICT,
+            'Cannot cancel a blood request that has already been resolved'
+        );
+    }
+
+    if (bloodRequest.status === 'cancelled') {
+        throw new ApiError(
+            statusCode.CONFLICT,
+            'Blood request has already been cancelled'
+        );
+    }
+
+    bloodRequest.status = 'cancelled';
+    bloodRequest.resolvedAt = new Date();
+    await bloodRequest.save();
+
+    return res.status(statusCode.OK).json(
+        new ApiResponse(
+            statusCode.OK,
+            'Blood request cancelled successfully',
+            {
+                requestId: bloodRequest._id,
+                bloodType: bloodRequest.bloodRequest.bloodType,
+                status: 'cancelled',
+                cancelledAt: bloodRequest.resolvedAt,
+            }
+        )
+    );
+});
+
+export { createEmergencyAlert, callAmbulance, upload,  requestBloodEmergency,
+    getBloodRequestDetails,
+    getMyBloodRequests,
+    cancelBloodRequest};

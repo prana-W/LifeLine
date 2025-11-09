@@ -9,7 +9,7 @@ const emergencySchema = new Schema(
         },
         type: {
             type: String,
-            enum: ['emergency', 'ambulance'],
+            enum: ['emergency', 'ambulance', 'blood'],
             required: true,
             default: 'emergency'
         },
@@ -24,8 +24,8 @@ const emergencySchema = new Schema(
             required: true,
         },
         location: {
-            latitude: { type: Number, required: true },
-            longitude: { type: Number, required: true },
+            latitude: { type: Number},
+            longitude: { type: Number },
             address: { type: String },
             city: { type: String },
             state: { type: String },
@@ -33,9 +33,33 @@ const emergencySchema = new Schema(
         audioVideoUrl: {
             type: String,
         },
+        // Blood request specific fields
+        bloodRequest: {
+            bloodType: {
+                type: String,
+                enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+            },
+            unitsRequired: {
+                type: Number,
+                min: 1,
+                max: 10,
+            },
+            urgencyLevel: {
+                type: String,
+                enum: ['Critical', 'High', 'Medium', 'Low'],
+            },
+            patientName: {
+                type: String,
+            },
+            reason: {
+                type: String,
+            },
+            contactNumber: {
+                type: String,
+            },
+        },
         timestamp: {
             type: Date,
-            required: true,
         },
         status: {
             type: String,

@@ -15,7 +15,7 @@ import userRouter from './routes/user.routes.js';
 const app = express();
 
 const skipMorgan = (req) => {
-    const ignoredPaths = ['/socket.io', '/favicon.ico', '__webpack_hmr'];
+    const ignoredPaths = ['/socket.io', '/favicon.ico', '__webpack_hmr', '/api/v1/visitors'];
     return ignoredPaths.some((path) => req.originalUrl.startsWith(path));
 };
 
