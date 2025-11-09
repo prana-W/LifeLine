@@ -8,6 +8,7 @@ import UserAuth from './pages/User/UserAuth.jsx';
 import BloodDonationHospitalPage from './pages/Hospital/BloodDonationHospitalPage.jsx';
 import BloodDonationUserPage from './pages/User/BloodDonationUserPage.jsx';
 import HospitalDashboard from './pages/Hospital/Dashboard.jsx';
+import BloodReceive from './pages/User/BloodReceive.jsx';
 
 import {createBrowserRouter, RouterProvider} from 'react-router-dom';
 import PharmacyAuth from './pages/Pharmacy/PharmacyAuth.jsx';
@@ -56,6 +57,10 @@ const router = createBrowserRouter([
             {
                 path: '/hospital/dashboard',
                 element: <HospitalDashboard />,
+            },
+            {
+                path: '/user/bloodreceive',
+                element: <BloodReceive />,
             },
             {
                 path: '*',
