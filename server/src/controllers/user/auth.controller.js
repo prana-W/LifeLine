@@ -4,7 +4,8 @@ import cookieOptions from "../../constants/cookieOptions.js";
 import User from "../../models/user.model.js";
 
 const signupUser = asyncHandler(async (req, res) => {
-    const { name, phoneNumber, password, pinCode, location, bloodType } = req.body;
+
+    const { name, phoneNumber, password, pinCode, location, bloodType } = req?.body;
 
     if (!name || !phoneNumber || !password || !pinCode || !bloodType) {
         throw new ApiError(statusCode.BAD_REQUEST, "All required fields must be provided!");
@@ -67,6 +68,7 @@ const loginUser = asyncHandler(async (req, res) => {
             new ApiResponse(statusCode.OK, "User logged in successfully.", {
                 name: user.name,
                 phoneNumber: user.phoneNumber,
+                userId: user?._id
             })
         );
 });

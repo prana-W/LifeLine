@@ -10,6 +10,7 @@ import visitorsRouter from './routes/visitors.routes.js';
 import hospitalAuthRouter from './routes/hospitalAuth.routes.js';
 import hospitalRouter from './routes/hospital.routes.js';
 import userAuthRouter from './routes/userAuth.routes.js'
+import userRouter from './routes/user.routes.js'
 
 const app = express();
 
@@ -51,6 +52,7 @@ app.use('/api/v1/user/auth', userAuthRouter);
 
 app.use('/api/v1/pharmacy', pharmacyRouter);
 app.use('/api/v1/hospital', hospitalRouter);
+app.use('/api/v1/user', userRouter);
 
 
 // Error Handling
