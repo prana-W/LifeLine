@@ -3,6 +3,7 @@ import ErrorBoundary from './components/ErrorBoundary.jsx';
 import { ThemeProvider } from "@/components/theme-provider"
 import Layout from './Layout.jsx';
 import Stock from './pages/Pharmacy/Stock.jsx';
+import HospitalAuth from './pages/Hospital/HospitalAuth.jsx';
 
 import {createBrowserRouter, RouterProvider} from 'react-router-dom';
 import PharmacyAuth from './pages/Pharmacy/PharmacyAuth.jsx';
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
             {
                 path: '/pharmacy/stock',
                 element: <Stock />,
+            },
+            {
+                path: '/Hospital/auth',
+                element: <HospitalAuth />,
             },
             {
                 path: '*',
