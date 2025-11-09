@@ -25,7 +25,21 @@ const userSchema = new mongoose.Schema({
     },
     location: {
         type: String,
-    }
+    },
+    bloodType: {
+        type: String,
+        required: true,
+        enum: [
+            "A+",
+            "A-",
+            "B+",
+            "B-",
+            "AB+",
+            "AB-",
+            "O+",
+            "O-"
+        ],
+    },
 
 });
 
