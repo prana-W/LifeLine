@@ -7,6 +7,7 @@ import morgan from 'morgan';
 import pharmacyAuthRouter from './routes/pharmacyAuth.routes.js';
 import pharmacyRouter from './routes/pharmacy.routes.js';
 import visitorsRouter from './routes/visitors.routes.js';
+import hospitalAuthRouter from './routes/hospitalAuth.routes.js';
 
 const app = express();
 
@@ -41,6 +42,7 @@ app.use('/api/v1/visitors', visitorsRouter);
 // Authentication Routes
 
 app.use('/api/v1/pharmacy/auth', pharmacyAuthRouter);
+app.use('/api/v1/hospital/auth', hospitalAuthRouter);
 
 // Routes
 

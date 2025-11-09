@@ -3,7 +3,6 @@ import bcrypt from "bcrypt";
 import {ApiError} from "../utility/index.js";
 import statusCode from "../constants/statusCode.js";
 import jwt from "jsonwebtoken";
-import Pharmacy from "./pharmacy.model.js";
 
 const hospitalSchema = new mongoose.Schema({
 
