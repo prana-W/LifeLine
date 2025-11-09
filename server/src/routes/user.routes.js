@@ -4,6 +4,7 @@ import {verifyAccessToken} from '../middlewares/index.js';
 import {
     createEmergencyAlert,
     upload,
+    callAmbulance
 } from '../controllers/emergency.controller.js';
 
 const user = Router();
@@ -15,5 +16,7 @@ user.post(
     upload.single('audioVideo'),
     createEmergencyAlert
 );
+
+user.post('/ambulance', verifyAccessToken, callAmbulance);
 
 export default user;

@@ -27,4 +27,8 @@ const getUserByPhoneNumber = asyncHandler(async (req, res) => {
         );
 });
 
+const callAmbulance = (asyncHandler(async (req, res) => {
+
+}));
+
 export {getUserByPhoneNumber};
