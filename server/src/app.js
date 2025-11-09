@@ -8,6 +8,8 @@ import pharmacyAuthRouter from './routes/pharmacyAuth.routes.js';
 import pharmacyRouter from './routes/pharmacy.routes.js';
 import visitorsRouter from './routes/visitors.routes.js';
 import hospitalAuthRouter from './routes/hospitalAuth.routes.js';
+import hospitalRouter from './routes/hospital.routes.js';
+import userAuthRouter from './routes/userAuth.routes.js'
 
 const app = express();
 
@@ -43,10 +45,12 @@ app.use('/api/v1/visitors', visitorsRouter);
 
 app.use('/api/v1/pharmacy/auth', pharmacyAuthRouter);
 app.use('/api/v1/hospital/auth', hospitalAuthRouter);
+app.use('/api/v1/user/auth', userAuthRouter);
 
 // Routes
 
 app.use('/api/v1/pharmacy', pharmacyRouter);
+app.use('/api/v1/hospital', hospitalRouter);
 
 
 // Error Handling
