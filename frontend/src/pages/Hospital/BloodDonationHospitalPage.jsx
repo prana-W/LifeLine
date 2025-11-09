@@ -28,7 +28,6 @@ export default function BloodDonation() {
 
   const [message, setMessage] = useState({ type: "", text: "" });
 
-
   // -----------------------------------
   // ✅ FETCH USER
   // -----------------------------------
@@ -68,7 +67,6 @@ export default function BloodDonation() {
     }
   };
 
-
   // -----------------------------------
   // ✅ SAVE BLOOD DONATION
   // -----------------------------------
@@ -95,11 +93,10 @@ export default function BloodDonation() {
       } else {
         toast.error(message || "Failed to save donation");
       }
-    } catch {
-       toast.error(err?.message || "Network error");
+    } catch (err) {
+      toast.error(err?.message || "Network error");
     }
   };
-
 
   // -----------------------------------
   // ✅ SAVE BLOOD RECEIVED
@@ -132,18 +129,20 @@ export default function BloodDonation() {
     }
   };
 
-
   return (
     <div
       className="min-h-screen flex items-center justify-center relative p-6"
-      style={{ backgroundColor: "#dce8fb" }}
+      style={{
+        background:
+          "linear-gradient(135deg, rgba(74,144,226,0.08), rgba(74,210,204,0.08))",
+      }}
     >
-      {/* ✅ GRID BACKGROUND */}
-      <div className="absolute inset-0 opacity-50 pointer-events-none">
+      {/* ✅ LIGHT GRID (subtle + matching footer blue) */}
+      <div className="absolute inset-0 opacity-40 pointer-events-none">
         <svg width="100%" height="100%">
           <defs>
             <pattern
-              id="grid-blue"
+              id="grid"
               width="40"
               height="40"
               patternUnits="userSpaceOnUse"
@@ -151,42 +150,40 @@ export default function BloodDonation() {
               <path
                 d="M 40 0 L 0 0 0 40"
                 fill="none"
-                stroke="rgba(120,160,255,0.35)"
-                strokeWidth="1.5"
+                stroke="rgba(74,144,226,0.28)"
+                strokeWidth="1"
               />
             </pattern>
           </defs>
-          <rect width="100%" height="100%" fill="url(#grid-blue)" />
+          <rect width="100%" height="100%" fill="url(#grid)" />
         </svg>
       </div>
 
       {/* ✅ MAIN CARD */}
       <Card
-        className="max-w-2xl w-full shadow-2xl border-none relative z-10 p-4"
+        className="max-w-2xl w-full shadow-xl border-none relative z-10 p-4"
         style={{
-          background:
-            "linear-gradient(135deg, rgba(240,244,255,0.9), rgba(225,235,255,0.85))",
-          backdropFilter: "blur(10px)",
+          background: "rgba(255,255,255,0.8)",
+          backdropFilter: "blur(12px)",
           borderRadius: "20px",
         }}
       >
         <CardHeader>
           <CardTitle
             className="text-3xl font-bold text-center"
-            style={{ color: "#244b8b" }}
+            style={{ color: "#0E2A47" }}
           >
             Blood Management
           </CardTitle>
           <CardDescription
             className="text-center"
-            style={{ color: "#3d5d96" }}
+            style={{ color: "#3A5A7A" }}
           >
             Add donation or receiving details
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-6">
-
           {/* ✅ ALERT */}
           {message.text && (
             <Alert
@@ -208,7 +205,7 @@ export default function BloodDonation() {
 
           {/* ✅ SEARCH USER */}
           <div className="space-y-2">
-            <Label className="font-semibold" style={{ color: "#244b8b" }}>
+            <Label className="font-semibold" style={{ color: "#0E2A47" }}>
               Enter User Phone Number
             </Label>
 
@@ -221,10 +218,12 @@ export default function BloodDonation() {
             </div>
           </div>
 
+          {/* ✅ Search Button (footer theme) */}
           <Button
             className="w-full text-white py-3 text-lg shadow-md"
             style={{
-              background: "linear-gradient(135deg, #6a8dff, #4a6cff)",
+              background:
+                "linear-gradient(135deg, #4A90E2 0%, #4AD2CC 100%)",
             }}
             onClick={handleFetchUser}
             disabled={loading}
@@ -237,47 +236,46 @@ export default function BloodDonation() {
             <Card
               className="mt-6 shadow-lg border"
               style={{
-                background:
-                  "linear-gradient(135deg, rgba(240,245,255,0.9), rgba(225,235,255,0.85))",
-                borderColor: "#bcd0ff",
+                background: "rgba(255,255,255,0.75)",
+                borderColor: "rgba(74,144,226,0.3)",
               }}
             >
               <CardHeader>
                 <CardTitle
                   className="text-xl font-bold flex items-center gap-2"
-                  style={{ color: "#244b8b" }}
+                  style={{ color: "#0E2A47" }}
                 >
-                  <User className="text-blue-500" /> {user.name}
+                  <User style={{ color: "#4A90E2" }} /> {user.name}
                 </CardTitle>
-                <CardDescription className="text-blue-700">
+                <CardDescription style={{ color: "#4A90E2" }}>
                   User Details
                 </CardDescription>
               </CardHeader>
 
               <CardContent className="space-y-3 text-blue-900">
                 <div className="flex items-center gap-2">
-                  <Phone className="h-5 w-5 text-blue-600" />
+                  <Phone className="h-5 w-5" style={{ color: "#4A90E2" }} />
                   <span>
                     <b>Phone:</b> {user.phoneNumber}
                   </span>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <MapPin className="h-5 w-5 text-blue-600" />
+                  <MapPin className="h-5 w-5" style={{ color: "#4A90E2" }} />
                   <span>
                     <b>Pin Code:</b> {user.pinCode}
                   </span>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <Locate className="h-5 w-5 text-blue-600" />
+                  <Locate className="h-5 w-5" style={{ color: "#4A90E2" }} />
                   <span>
                     <b>Location:</b> {user.location || "Not Provided"}
                   </span>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <Droplet className="h-5 w-5 text-red-500" />
+                  <Droplet className="h-5 w-5" style={{ color: "#FF6B6B" }} />
                   <span>
                     <b>Blood Type:</b> {user.bloodType}
                   </span>
@@ -286,17 +284,16 @@ export default function BloodDonation() {
             </Card>
           )}
 
-          {/* ✅ DONATION + RECEIVING SECTIONS */}
+          {/* ✅ DONATION + RECEIVING */}
           {user && (
             <div className="mt-6 space-y-10">
-
               {/* ✅ Donation */}
               <div className="space-y-3">
                 <Label
                   className="font-semibold flex items-center gap-2"
-                  style={{ color: "#244b8b" }}
+                  style={{ color: "#0E2A47" }}
                 >
-                  <Droplet className="h-5 w-5 text-red-500" />
+                  <Droplet className="h-5 w-5" style={{ color: "#FF6B6B" }} />
                   {user.name} has DONATED blood
                 </Label>
 
@@ -305,9 +302,9 @@ export default function BloodDonation() {
                   className="py-6"
                   placeholder="Enter donation quantity (ml)"
                   style={{
-                    borderColor: "#bcd0ff",
+                    borderColor: "rgba(74,144,226,0.35)",
                     background:
-                      "linear-gradient(135deg, #e8f0ff, #dae8ff)",
+                      "linear-gradient(135deg, #F5FBFF, #ECF9FF)",
                   }}
                   value={donationQty}
                   onChange={(e) => setDonationQty(e.target.value)}
@@ -316,7 +313,8 @@ export default function BloodDonation() {
                 <Button
                   className="w-full text-white py-3 text-lg shadow-md"
                   style={{
-                    background: "linear-gradient(135deg, #4fc476, #3da45e)",
+                    background:
+                      "linear-gradient(135deg, #4A90E2 0%, #4AD2CC 100%)",
                   }}
                   onClick={handleDonationSubmit}
                 >
@@ -328,9 +326,9 @@ export default function BloodDonation() {
               <div className="space-y-3">
                 <Label
                   className="font-semibold flex items-center gap-2"
-                  style={{ color: "#244b8b" }}
+                  style={{ color: "#0E2A47" }}
                 >
-                  <Droplet className="h-5 w-5 text-blue-600" />
+                  <Droplet className="h-5 w-5" style={{ color: "#4A90E2" }} />
                   {user.name} has RECEIVED blood
                 </Label>
 
@@ -339,9 +337,9 @@ export default function BloodDonation() {
                   className="py-6"
                   placeholder="Enter received quantity (ml)"
                   style={{
-                    borderColor: "#bcd0ff",
+                    borderColor: "rgba(74,144,226,0.35)",
                     background:
-                      "linear-gradient(135deg, #ffecec, #ffdada)",
+                      "linear-gradient(135deg, #F5FBFF, #ECF9FF)",
                   }}
                   value={receivedQty}
                   onChange={(e) => setReceivedQty(e.target.value)}
@@ -350,17 +348,16 @@ export default function BloodDonation() {
                 <Button
                   className="w-full text-white py-3 text-lg shadow-md"
                   style={{
-                    background: "linear-gradient(135deg, #ff6b6b, #e45252)",
+                    background:
+                      "linear-gradient(135deg, #FF6B6B 0%, #EF4D4D 100%)",
                   }}
                   onClick={handleReceiveSubmit}
                 >
                   Save Blood Received
                 </Button>
               </div>
-
             </div>
           )}
-
         </CardContent>
       </Card>
     </div>
