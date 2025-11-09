@@ -1,4 +1,4 @@
-import {useState, useCallback} from 'react';
+import { useState, useCallback } from 'react';
 
 const useApi = (baseURL = import.meta.env.VITE_SERVER_URL) => {
     const [loading, setLoading] = useState(false);
@@ -18,17 +18,30 @@ const useApi = (baseURL = import.meta.env.VITE_SERVER_URL) => {
 
             const config = {
                 method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...headers,
-                },
                 cache: 'no-store',
                 credentials: 'include',
                 ...customConfig,
             };
 
+            // ✅ Auto-handle FormData vs JSON
             if (body && method !== 'GET' && method !== 'DELETE') {
-                config.body = JSON.stringify(body);
+                if (body instanceof FormData) {
+                    // Don’t set Content-Type, browser will do it
+                    config.body = body;
+                    config.headers = { ...headers };
+                } else {
+                    // Normal JSON request
+                    config.body = JSON.stringify(body);
+                    config.headers = {
+                        'Content-Type': 'application/json',
+                        ...headers,
+                    };
+                }
+            } else {
+                config.headers = {
+                    'Content-Type': 'application/json',
+                    ...headers,
+                };
             }
 
             try {
@@ -52,7 +65,7 @@ const useApi = (baseURL = import.meta.env.VITE_SERVER_URL) => {
                 setLoading(false);
                 return {
                     data: data?.data,
-                    success: data?.success,
+                    success: data?.success ?? true,
                     message: data?.message,
                     statusCode: data?.statusCode,
                 };
@@ -67,99 +80,26 @@ const useApi = (baseURL = import.meta.env.VITE_SERVER_URL) => {
 
     // Convenience methods
     const get = useCallback(
-        (endpoint, options = {}) => {
-            return request(endpoint, {...options, method: 'GET'});
-        },
+        (endpoint, options = {}) => request(endpoint, { ...options, method: 'GET' }),
         [request]
     );
 
     const post = useCallback(
-        (endpoint, body, options = {}) => {
-            return request(endpoint, {...options, method: 'POST', body});
-        },
+        (endpoint, body, options = {}) => request(endpoint, { ...options, method: 'POST', body }),
         [request]
     );
 
     const put = useCallback(
-        (endpoint, body, options = {}) => {
-            return request(endpoint, {...options, method: 'PUT', body});
-        },
+        (endpoint, body, options = {}) => request(endpoint, { ...options, method: 'PUT', body }),
         [request]
     );
 
     const del = useCallback(
-        (endpoint, options = {}) => {
-            return request(endpoint, {...options, method: 'DELETE'});
-        },
+        (endpoint, options = {}) => request(endpoint, { ...options, method: 'DELETE' }),
         [request]
     );
 
-    return {
-        loading,
-        error,
-        get,
-        post,
-        put,
-        delete: del,
-    };
+    return { loading, error, get, post, put, delete: del };
 };
 
 export default useApi;
-
-// USAGE EXAMPLE:
-/*
-import useApi from '@/hooks/useApi';
-
-function MyComponent() {
-  const api = useApi();
-  const [users, setUsers] = useState([]);
-
-  // GET request
-  const fetchUsers = async () => {
-    try {
-      const { data } = await api.get('/users');
-      setUsers(data);
-    } catch (err) {
-      console.error('Failed to fetch users:', err);
-    }
-  };
-
-  // POST request
-  const createUser = async (userData) => {
-    try {
-      const { data } = await api.post('/users', userData);
-      console.log('User created:', data);
-    } catch (err) {
-      console.error('Failed to create user:', err);
-    }
-  };
-
-  // PUT request
-  const updateUser = async (userId, userData) => {
-    try {
-      const { data } = await api.put(`/users/${userId}`, userData);
-      console.log('User updated:', data);
-    } catch (err) {
-      console.error('Failed to update user:', err);
-    }
-  };
-
-  // DELETE request
-  const deleteUser = async (userId) => {
-    try {
-      await api.delete(`/users/${userId}`);
-      console.log('User deleted');
-    } catch (err) {
-      console.error('Failed to delete user:', err);
-    }
-  };
-
-  return (
-    <div>
-      {api.loading && <Spinner />}
-      {api.error && <Toast>Error: {api.error}</Toast>}
-      <button onClick={fetchUsers}>Fetch Users</button>
-    </div>
-  );
-}
-*/
