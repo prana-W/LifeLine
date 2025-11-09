@@ -323,7 +323,7 @@ export default function PharmacyAuth() {
                         <div>
                           <Label className="text-violet-500 mb-1.5">Shop Name</Label>
                           <Input
-                            className="bg-white/20 border-white/30 text-white"
+                            className="bg-white/20 border-white/30 text-black"
                             value={signupForm.shopName}
                             onChange={(e) =>
                               setSignupForm({ ...signupForm, shopName: e.target.value })
@@ -334,7 +334,7 @@ export default function PharmacyAuth() {
                         <div>
                           <Label className="text-violet-500 mb-1.5">Owner Name</Label>
                           <Input
-                            className="bg-white/20 border-white/30 text-white"
+                            className="bg-white/20 border-white/30 text-black"
                             value={signupForm.ownerName}
                             onChange={(e) =>
                               setSignupForm({ ...signupForm, ownerName: e.target.value })
@@ -346,7 +346,7 @@ export default function PharmacyAuth() {
                       <div>
                         <Label className="text-violet-500 mb-1.5">Phone Number *</Label>
                         <Input
-                          className="bg-white/20 border-white/30 text-white"
+                          className="bg-white/20 border-white/30 text-black"
                           value={signupForm.phoneNumber}
                           onChange={(e) =>
                             setSignupForm({ ...signupForm, phoneNumber: e.target.value })
@@ -358,7 +358,7 @@ export default function PharmacyAuth() {
                       <div>
                         <Label className="text-violet-500 mb-1.5">License Number *</Label>
                         <Input
-                          className="bg-white/20 border-white/30 text-white"
+                          className="bg-white/20 border-white/30 text-black"
                           value={signupForm.licenseNumber}
                           onChange={(e) =>
                             setSignupForm({ ...signupForm, licenseNumber: e.target.value })
@@ -371,7 +371,7 @@ export default function PharmacyAuth() {
                         <div>
                           <Label className="text-violet-500 mb-1.5">Pin Code *</Label>
                           <Input
-                            className="bg-white/20 border-white/30 text-white"
+                            className="bg-white/20 border-white/30 text-black"
                             value={signupForm.pinCode}
                             onChange={(e) =>
                               setSignupForm({ ...signupForm, pinCode: e.target.value })
@@ -383,7 +383,7 @@ export default function PharmacyAuth() {
                         <div>
                           <Label className="text-violet-500 mb-1.5">Location</Label>
                           <Input
-                            className="bg-white/20 border-white/30 text-white"
+                            className="bg-white/20 border-white/30 text-black"
                             value={signupForm.location}
                             onChange={(e) =>
                               setSignupForm({ ...signupForm, location: e.target.value })
@@ -397,7 +397,7 @@ export default function PharmacyAuth() {
                           <Label className="text-violet-500 mb-1.5">Password *</Label>
                           <Input
                             type="password"
-                            className="bg-white/20 border-white/30 text-white"
+                            className="bg-white/20 border-white/30 text-black"
                             value={signupForm.password}
                             onChange={(e) =>
                               setSignupForm({ ...signupForm, password: e.target.value })
@@ -410,7 +410,7 @@ export default function PharmacyAuth() {
                           <Label className="text-violet-500 mb-1.5">Confirm *</Label>
                           <Input
                             type="password"
-                            className="bg-white/20 border-white/30 text-white"
+                            className="bg-white/20 border-white/30 text-black"
                             value={signupForm.confirmPassword}
                             onChange={(e) =>
                               setSignupForm({

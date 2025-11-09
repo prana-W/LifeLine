@@ -7,10 +7,10 @@ import HospitalAuth from './pages/Hospital/HospitalAuth.jsx';
 import UserAuth from './pages/User/UserAuth.jsx';
 import BloodDonationHospitalPage from './pages/Hospital/BloodDonationHospitalPage.jsx';
 import BloodDonationUserPage from './pages/User/BloodDonationUserPage.jsx';
+import HospitalDashboard from './pages/Hospital/Dashboard.jsx';
 
 import {createBrowserRouter, RouterProvider} from 'react-router-dom';
 import PharmacyAuth from './pages/Pharmacy/PharmacyAuth.jsx';
-import PinCodeFinder from "@/components/emergency.jsx";
 
 const router = createBrowserRouter([
     {
@@ -52,6 +52,10 @@ const router = createBrowserRouter([
             {
                 path: '/user/bloodDonationUserPage',
                 element: <BloodDonationUserPage />,
+            },
+            {
+                path: '/hospital/dashboard',
+                element: <HospitalDashboard />,
             },
             {
                 path: '*',
