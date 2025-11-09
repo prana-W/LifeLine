@@ -4,7 +4,8 @@ import cookieParser from 'cookie-parser';
 import checkHealth from './controllers/checkHealth.controller.js';
 import {errorHandler } from './middlewares/index.js';
 import morgan from 'morgan';
-import pharmacyRouter from './routes/pharmacyAuth.routes.js';
+import pharmacyAuthRouter from './routes/pharmacyAuth.routes.js';
+import pharmacyRouter from './routes/pharmacy.routes.js';
 import visitorsRouter from './routes/visitors.routes.js';
 
 const app = express();
@@ -35,8 +36,16 @@ app.use(cookieParser());
 
 app.get('/', checkHealth);
 app.get('/api/v1/check-health', checkHealth);
-app.use('/api/v1/pharmacy/auth', pharmacyRouter);
 app.use('/api/v1/visitors', visitorsRouter);
+
+// Authentication Routes
+
+app.use('/api/v1/pharmacy/auth', pharmacyAuthRouter);
+
+// Routes
+
+app.use('/api/v1/pharmacy', pharmacyRouter);
+
 
 // Error Handling
 app.use(errorHandler());
