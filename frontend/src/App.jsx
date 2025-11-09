@@ -5,6 +5,7 @@ import Layout from './Layout.jsx';
 
 
 import {createBrowserRouter, RouterProvider} from 'react-router-dom';
+import PharmacyAuth from './pages/Pharmacy/PharmacyAuth.jsx';
 
 const router = createBrowserRouter([
     {
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
             {
                 path: 'test',
                 element: <Test />,
+            },
+            {
+                path: '/pharmacy/auth',
+                element: <PharmacyAuth />,
             },
             {
                 path: '*',
