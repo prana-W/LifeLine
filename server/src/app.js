@@ -9,7 +9,12 @@ import visitorsRouter from './routes/visitors.routes.js';
 
 const app = express();
 
-app.use(morgan('dev'));
+const skipMorgan = (req) => {
+    const ignoredPaths = ["/socket.io", "/favicon.ico", "__webpack_hmr"];
+    return ignoredPaths.some((path) => req.originalUrl.startsWith(path));
+};
+
+app.use(morgan("dev", { skip: skipMorgan }));
 
 const allowedOrigins = process.env.CORS_ORIGIN?.split(',') || [];
 
