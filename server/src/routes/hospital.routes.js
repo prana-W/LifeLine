@@ -1,8 +1,5 @@
 import {Router} from 'express';
-import {
-    addBloodDonation
-
-} from '../controllers/hospital/hospital.controller.js';
+import {addBloodDonation} from '../controllers/hospital/hospital.controller.js';
 import {verifyAccessToken} from '../middlewares/index.js';
 
 const authRouter = Router();

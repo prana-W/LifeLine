@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
-import bcrypt from "bcrypt";
-import {ApiError} from "../utility/index.js";
-import statusCode from "../constants/statusCode.js";
-import jwt from "jsonwebtoken";
-import Pharmacy from "./pharmacy.model.js";
+import bcrypt from 'bcrypt';
+import {ApiError} from '../utility/index.js';
+import statusCode from '../constants/statusCode.js';
+import jwt from 'jsonwebtoken';
+import Pharmacy from './pharmacy.model.js';
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema({
     },
     pinCode: {
         type: String,
-        required: true
+        required: true,
     },
     location: {
         type: String,
@@ -29,18 +29,8 @@ const userSchema = new mongoose.Schema({
     bloodType: {
         type: String,
         required: true,
-        enum: [
-            "A+",
-            "A-",
-            "B+",
-            "B-",
-            "AB+",
-            "AB-",
-            "O+",
-            "O-"
-        ],
+        enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
     },
-
 });
 
 userSchema.pre('save', async function (next) {
@@ -51,11 +41,8 @@ userSchema.pre('save', async function (next) {
     next();
 });
 
-userSchema.methods.generateAccessTokenFromUserId = async (
-    userId
-) => {
+userSchema.methods.generateAccessTokenFromUserId = async (userId) => {
     try {
-
         const user = await User.findById(userId);
 
         if (!user) {
@@ -68,13 +55,12 @@ userSchema.methods.generateAccessTokenFromUserId = async (
         const payload = {
             userId: user?._id,
             phone: user?.phoneNumber,
-            pinCode: user?.pinCode
+            pinCode: user?.pinCode,
         };
 
         return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
             expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
         });
-
     } catch (error) {
         throw error;
     }

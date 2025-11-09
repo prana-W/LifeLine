@@ -19,21 +19,21 @@ const pharmacySchema = new mongoose.Schema(
             required: true,
         },
         ownerName: {
-            type: String
+            type: String,
         },
         licenseNumber: {
             type: String,
             required: true,
-            unique: true
+            unique: true,
         },
         pinCode: {
             type: String,
-            required: true
+            required: true,
         },
         location: {
             type: String,
-            default: ''
-        }
+            default: '',
+        },
     },
     {timestamps: true}
 );
@@ -46,11 +46,8 @@ pharmacySchema.pre('save', async function (next) {
     next();
 });
 
-pharmacySchema.methods.generateAccessTokenFromUserId = async (
-userId
-) => {
+pharmacySchema.methods.generateAccessTokenFromUserId = async (userId) => {
     try {
-
         const user = await Pharmacy.findById(userId);
 
         if (!user) {
@@ -63,13 +60,12 @@ userId
         const payload = {
             userId: user?._id,
             phone: user?.phoneNumber,
-            pinCode: user?.pinCode
+            pinCode: user?.pinCode,
         };
 
         return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
             expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
         });
-
     } catch (error) {
         throw error;
     }

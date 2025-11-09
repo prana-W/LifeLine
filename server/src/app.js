@@ -2,24 +2,24 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import checkHealth from './controllers/checkHealth.controller.js';
-import {errorHandler } from './middlewares/index.js';
+import {errorHandler} from './middlewares/index.js';
 import morgan from 'morgan';
 import pharmacyAuthRouter from './routes/pharmacyAuth.routes.js';
 import pharmacyRouter from './routes/pharmacy.routes.js';
 import visitorsRouter from './routes/visitors.routes.js';
 import hospitalAuthRouter from './routes/hospitalAuth.routes.js';
 import hospitalRouter from './routes/hospital.routes.js';
-import userAuthRouter from './routes/userAuth.routes.js'
-import userRouter from './routes/user.routes.js'
+import userAuthRouter from './routes/userAuth.routes.js';
+import userRouter from './routes/user.routes.js';
 
 const app = express();
 
 const skipMorgan = (req) => {
-    const ignoredPaths = ["/socket.io", "/favicon.ico", "__webpack_hmr"];
+    const ignoredPaths = ['/socket.io', '/favicon.ico', '__webpack_hmr'];
     return ignoredPaths.some((path) => req.originalUrl.startsWith(path));
 };
 
-app.use(morgan("dev", { skip: skipMorgan }));
+app.use(morgan('dev', {skip: skipMorgan}));
 
 const allowedOrigins = process.env.CORS_ORIGIN?.split(',') || [];
 
@@ -53,7 +53,6 @@ app.use('/api/v1/user/auth', userAuthRouter);
 app.use('/api/v1/pharmacy', pharmacyRouter);
 app.use('/api/v1/hospital', hospitalRouter);
 app.use('/api/v1/user', userRouter);
-
 
 // Error Handling
 app.use(errorHandler());

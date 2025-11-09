@@ -1,7 +1,5 @@
 import {Router} from 'express';
-import {
-    getUserByPhoneNumber
-} from '../controllers/user/user.controller.js';
+import {getUserByPhoneNumber} from '../controllers/user/user.controller.js';
 
 const user = Router();
 

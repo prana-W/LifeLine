@@ -1,10 +1,11 @@
 import {ApiError, ApiResponse, asyncHandler} from '../../utility/index.js';
 import statusCode from '../../constants/statusCode.js';
 import cookieOptions from '../../constants/cookieOptions.js';
-import Pharmacy from "../../models/pharmacy.model.js";
+import Pharmacy from '../../models/pharmacy.model.js';
 
 const signupUser = asyncHandler(async (req, res) => {
-    const {pinCode, licenseNumber, phoneNumber, password, shopName, location} = req?.body;
+    const {pinCode, licenseNumber, phoneNumber, password, shopName, location} =
+        req?.body;
 
     if (!pinCode || !licenseNumber || !phoneNumber || !password) {
         throw new ApiError(statusCode.BAD_REQUEST, 'All fields are required!');
@@ -21,7 +22,14 @@ const signupUser = asyncHandler(async (req, res) => {
         );
     }
 
-    const user = await Pharmacy.create({pinCode, licenseNumber, phoneNumber, password, shopName, location});
+    const user = await Pharmacy.create({
+        pinCode,
+        licenseNumber,
+        phoneNumber,
+        password,
+        shopName,
+        location,
+    });
 
     return res.status(statusCode.OK).json(
         new ApiResponse(statusCode.OK, 'Pharmacy registered successfully.', {
@@ -53,8 +61,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
     // After all validations, generate tokens, store refresh token in DB and send tokens in cookies
 
-    const accessToken =
-        await user.generateAccessTokenFromUserId(user?._id);
+    const accessToken = await user.generateAccessTokenFromUserId(user?._id);
 
     if (!accessToken) {
         throw new ApiError(
@@ -67,7 +74,11 @@ const loginUser = asyncHandler(async (req, res) => {
         .status(statusCode.OK)
         .cookie('accessToken', accessToken, cookieOptions)
         .json(
-            new ApiResponse(statusCode.OK, 'Pharmacy logged in successfully.', {})
+            new ApiResponse(
+                statusCode.OK,
+                'Pharmacy logged in successfully.',
+                {}
+            )
         );
 });
 
@@ -86,7 +97,9 @@ const logoutUser = asyncHandler(async (req, res) => {
     return res
         .status(statusCode.OK)
         .cookie('accessToken', cookieOptions)
-        .json(new ApiResponse(statusCode.OK, 'Pharmacy logged out successfully.'));
+        .json(
+            new ApiResponse(statusCode.OK, 'Pharmacy logged out successfully.')
+        );
 });
 
 export {signupUser, loginUser, logoutUser};

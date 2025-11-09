@@ -1,11 +1,10 @@
 import mongoose from 'mongoose';
-import bcrypt from "bcrypt";
-import {ApiError} from "../utility/index.js";
-import statusCode from "../constants/statusCode.js";
-import jwt from "jsonwebtoken";
+import bcrypt from 'bcrypt';
+import {ApiError} from '../utility/index.js';
+import statusCode from '../constants/statusCode.js';
+import jwt from 'jsonwebtoken';
 
 const hospitalSchema = new mongoose.Schema({
-
     name: {
         type: String,
         required: true,
@@ -20,13 +19,12 @@ const hospitalSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
     },
     password: {
         type: String,
         required: true,
-    }
-
+    },
 });
 
 hospitalSchema.pre('save', async function (next) {
@@ -37,11 +35,8 @@ hospitalSchema.pre('save', async function (next) {
     next();
 });
 
-hospitalSchema.methods.generateAccessTokenFromUserId = async (
-    userId
-) => {
+hospitalSchema.methods.generateAccessTokenFromUserId = async (userId) => {
     try {
-
         const user = await Hospital.findById(userId);
 
         if (!user) {
@@ -54,13 +49,12 @@ hospitalSchema.methods.generateAccessTokenFromUserId = async (
         const payload = {
             userId: user?._id,
             email: user?.email,
-            pinCode: user?.pinCode
+            pinCode: user?.pinCode,
         };
 
         return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
             expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
         });
-
     } catch (error) {
         throw error;
     }
