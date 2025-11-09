@@ -22,13 +22,18 @@ export default function BloodDonation() {
   const [loading, setLoading] = useState(false);
 
   const [user, setUser] = useState(null);
-  const [quantity, setQuantity] = useState("");
+
+  const [donationQty, setDonationQty] = useState("");
+  const [receivedQty, setReceivedQty] = useState("");
 
   const [message, setMessage] = useState({ type: "", text: "" });
 
-  // ---------------- FETCH USER (GET) ----------------
+
+  // -----------------------------------
+  // ✅ FETCH USER
+  // -----------------------------------
   const handleFetchUser = async () => {
-    if (!phone.trim()) return;
+    if (!phone.trim()) return toast.error("Enter phone number!");
 
     setLoading(true);
     setMessage({ type: "", text: "" });
@@ -38,28 +43,41 @@ export default function BloodDonation() {
 
       if (success) {
         setUser(data);
-        toast.success("User found!");
+
+        toast.success("User found!", {
+          duration: 1200,
+          className: "bg-green-500 text-white font-semibold",
+        });
       } else {
         setUser(null);
         setMessage({ type: "error", text: message || "User not found!" });
+
+        toast.error("User not found!", {
+          duration: 1300,
+          className: "bg-red-500 text-white",
+        });
       }
     } catch {
       setMessage({ type: "error", text: "Network error. Try again." });
+
+      toast.error("Network error!", {
+        duration: 1200,
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  // ---------------- SUBMIT DONATION (POST) ----------------
+
+  // -----------------------------------
+  // ✅ SAVE BLOOD DONATION
+  // -----------------------------------
   const handleDonationSubmit = async () => {
-    if (!quantity.trim()) {
-      toast.error("Please enter quantity!");
-      return;
-    }
+    if (!donationQty.trim()) return toast.error("Enter donated quantity!");
 
     const payload = {
       donorId: user._id,
-      quantity: Number(quantity),
+      quantity: Number(donationQty),
     };
 
     try {
@@ -69,22 +87,58 @@ export default function BloodDonation() {
       );
 
       if (success) {
-        toast.success("Donation recorded!");
-        setQuantity("");
+        toast.success("Donation recorded!", {
+          duration: 1400,
+          className: "bg-green-600 text-white font-semibold",
+        });
+        setDonationQty("");
       } else {
         toast.error(message || "Failed to save donation");
       }
     } catch {
-      toast.error("Network error");
+       toast.error(err?.message || "Network error");
     }
   };
+
+
+  // -----------------------------------
+  // ✅ SAVE BLOOD RECEIVED
+  // -----------------------------------
+  const handleReceiveSubmit = async () => {
+    if (!receivedQty.trim()) return toast.error("Enter received quantity!");
+
+    const payload = {
+      receiverId: user._id,
+      quantity: Number(receivedQty),
+    };
+
+    try {
+      const { success, message } = await api.post(
+        "/hospital/giveBloodDonation",
+        payload
+      );
+
+      if (success) {
+        toast.success("Receive entry saved!", {
+          duration: 1400,
+          className: "bg-blue-600 text-white font-semibold",
+        });
+        setReceivedQty("");
+      } else {
+        toast.error(message || "Failed to record receive entry");
+      }
+    } catch (err) {
+      toast.error(err?.message || "Network error");
+    }
+  };
+
 
   return (
     <div
       className="min-h-screen flex items-center justify-center relative p-6"
       style={{ backgroundColor: "#dce8fb" }}
     >
-      {/* GRID BACKGROUND */}
+      {/* ✅ GRID BACKGROUND */}
       <div className="absolute inset-0 opacity-50 pointer-events-none">
         <svg width="100%" height="100%">
           <defs>
@@ -106,7 +160,7 @@ export default function BloodDonation() {
         </svg>
       </div>
 
-      {/* MAIN CARD */}
+      {/* ✅ MAIN CARD */}
       <Card
         className="max-w-2xl w-full shadow-2xl border-none relative z-10 p-4"
         style={{
@@ -121,18 +175,19 @@ export default function BloodDonation() {
             className="text-3xl font-bold text-center"
             style={{ color: "#244b8b" }}
           >
-            Blood Donation Entry
+            Blood Management
           </CardTitle>
           <CardDescription
             className="text-center"
             style={{ color: "#3d5d96" }}
           >
-            Search user and update blood donation details
+            Add donation or receiving details
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-6">
-          {/* ALERT */}
+
+          {/* ✅ ALERT */}
           {message.text && (
             <Alert
               className={`border-none ${
@@ -141,7 +196,9 @@ export default function BloodDonation() {
             >
               <AlertDescription
                 className={`font-medium ${
-                  message.type === "success" ? "text-green-700" : "text-red-700"
+                  message.type === "success"
+                    ? "text-green-700"
+                    : "text-red-700"
                 }`}
               >
                 {message.text}
@@ -149,7 +206,7 @@ export default function BloodDonation() {
             </Alert>
           )}
 
-          {/* SEARCH INPUT */}
+          {/* ✅ SEARCH USER */}
           <div className="space-y-2">
             <Label className="font-semibold" style={{ color: "#244b8b" }}>
               Enter User Phone Number
@@ -175,7 +232,7 @@ export default function BloodDonation() {
             {loading ? "Searching..." : "Search User"}
           </Button>
 
-          {/* USER DETAILS CARD */}
+          {/* ✅ USER INFO CARD */}
           {user && (
             <Card
               className="mt-6 shadow-lg border"
@@ -229,40 +286,81 @@ export default function BloodDonation() {
             </Card>
           )}
 
-          {/* DONATION FORM */}
+          {/* ✅ DONATION + RECEIVING SECTIONS */}
           {user && (
-            <div className="mt-6 space-y-4">
-              <Label
-                className="font-semibold flex items-center gap-2"
-                style={{ color: "#244b8b" }}
-              >
-                <Droplet className="h-5 w-5 text-red-500" />
-                Quantity Donated (ml)
-              </Label>
+            <div className="mt-6 space-y-10">
 
-              <Input
-                type="number"
-                className="py-6"
-                style={{
-                  borderColor: "#bcd0ff",
-                  background: "linear-gradient(135deg, #e8f0ff, #dae8ff)",
-                }}
-                placeholder="Enter quantity"
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
-              />
+              {/* ✅ Donation */}
+              <div className="space-y-3">
+                <Label
+                  className="font-semibold flex items-center gap-2"
+                  style={{ color: "#244b8b" }}
+                >
+                  <Droplet className="h-5 w-5 text-red-500" />
+                  {user.name} has DONATED blood
+                </Label>
 
-              <Button
-                className="w-full text-white py-3 text-lg shadow-md"
-                style={{
-                  background: "linear-gradient(135deg, #4fc476, #3da45e)",
-                }}
-                onClick={handleDonationSubmit}
-              >
-                Save Donation
-              </Button>
+                <Input
+                  type="number"
+                  className="py-6"
+                  placeholder="Enter donation quantity (ml)"
+                  style={{
+                    borderColor: "#bcd0ff",
+                    background:
+                      "linear-gradient(135deg, #e8f0ff, #dae8ff)",
+                  }}
+                  value={donationQty}
+                  onChange={(e) => setDonationQty(e.target.value)}
+                />
+
+                <Button
+                  className="w-full text-white py-3 text-lg shadow-md"
+                  style={{
+                    background: "linear-gradient(135deg, #4fc476, #3da45e)",
+                  }}
+                  onClick={handleDonationSubmit}
+                >
+                  Save Donation
+                </Button>
+              </div>
+
+              {/* ✅ Receiving */}
+              <div className="space-y-3">
+                <Label
+                  className="font-semibold flex items-center gap-2"
+                  style={{ color: "#244b8b" }}
+                >
+                  <Droplet className="h-5 w-5 text-blue-600" />
+                  {user.name} has RECEIVED blood
+                </Label>
+
+                <Input
+                  type="number"
+                  className="py-6"
+                  placeholder="Enter received quantity (ml)"
+                  style={{
+                    borderColor: "#bcd0ff",
+                    background:
+                      "linear-gradient(135deg, #ffecec, #ffdada)",
+                  }}
+                  value={receivedQty}
+                  onChange={(e) => setReceivedQty(e.target.value)}
+                />
+
+                <Button
+                  className="w-full text-white py-3 text-lg shadow-md"
+                  style={{
+                    background: "linear-gradient(135deg, #ff6b6b, #e45252)",
+                  }}
+                  onClick={handleReceiveSubmit}
+                >
+                  Save Blood Received
+                </Button>
+              </div>
+
             </div>
           )}
+
         </CardContent>
       </Card>
     </div>
