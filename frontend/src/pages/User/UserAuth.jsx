@@ -243,7 +243,7 @@ export default function UserAuth() {
                         Phone Number
                       </Label>
                       <div className="relative">
-                        <Phone className="absolute left-3 top-3 text-white/70" />
+                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70" />
                         <Input
                           className="pl-10 bg-white/20 text-white placeholder-white/60 border-white/30"
                           placeholder="Enter phone number"
@@ -260,7 +260,7 @@ export default function UserAuth() {
                         Password
                       </Label>
                       <div className="relative">
-                        <Lock className="absolute left-3 top-3 text-white/70" />
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70" />
                         <Input
                           type="password"
                           className="pl-10 bg-white/20 text-white placeholder-white/60 border-white/30"
@@ -292,7 +292,7 @@ export default function UserAuth() {
                           Full Name
                         </Label>
                         <div className="relative">
-                          <User className="absolute left-3 top-3 text-white/70" />
+                          <User className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70" />
                           <Input
                             className="pl-10 bg-white/20 text-white border-white/30 placeholder-white/60"
                             placeholder="John Doe"
@@ -309,7 +309,7 @@ export default function UserAuth() {
                           Phone Number
                         </Label>
                         <div className="relative">
-                          <Phone className="absolute left-3 top-3 text-white/70" />
+                          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70" />
                           <Input
                             className="pl-10 bg-white/20 text-white border-white/30 placeholder-white/60"
                             placeholder="9876543210"
@@ -326,7 +326,7 @@ export default function UserAuth() {
                           Pin Code
                         </Label>
                         <div className="relative">
-                          <MapPin className="absolute left-3 top-3 text-white/70" />
+                          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70" />
                           <Input
                             className="pl-10 bg-white/20 text-white border-white/30 placeholder-white/60"
                             placeholder="110045"
@@ -379,7 +379,7 @@ export default function UserAuth() {
                           Password
                         </Label>
                         <div className="relative">
-                          <Lock className="absolute left-3 top-3 text-white/70" />
+                          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70" />
                           <Input
                             type="password"
                             className="pl-10 bg-white/20 text-white border-white/30 placeholder-white/60"
@@ -397,7 +397,7 @@ export default function UserAuth() {
                           Confirm Password
                         </Label>
                         <div className="relative">
-                          <Lock className="absolute left-3 top-3 text-white/70" />
+                          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70" />
                           <Input
                             type="password"
                             className="pl-10 bg-white/20 text-white border-white/30 placeholder-white/60"
