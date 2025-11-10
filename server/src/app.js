@@ -11,6 +11,7 @@ import hospitalAuthRouter from './routes/hospitalAuth.routes.js';
 import hospitalRouter from './routes/hospital.routes.js';
 import userAuthRouter from './routes/userAuth.routes.js';
 import userRouter from './routes/user.routes.js';
+import path from "path";
 
 const app = express();
 
@@ -21,7 +22,7 @@ const skipMorgan = (req) => {
 
 app.use(morgan('dev', {skip: skipMorgan}));
 
-const allowedOrigins = process.env.CORS_ORIGIN?.split(',') || [];
+const allowedOrigins = process.env.CORS_ORIGIN.split(',') || [];
 
 app.use(
     cors({
@@ -31,6 +32,8 @@ app.use(
 );
 
 app.use(express.json());
+
+app.use("/uploads", express.static(path.join(process.cwd(), "src/uploads")));
 
 app.use(express.urlencoded({extended: true}));
 app.use(express.static('public'));

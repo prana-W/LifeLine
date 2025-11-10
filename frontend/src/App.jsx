@@ -7,12 +7,12 @@ import HospitalAuth from './pages/Hospital/HospitalAuth.jsx';
 import UserAuth from './pages/User/UserAuth.jsx';
 import BloodDonationHospitalPage from './pages/Hospital/BloodDonationHospitalPage.jsx';
 import BloodDonationUserPage from './pages/User/BloodDonationUserPage.jsx';
-import HospitalDashboard from './pages/Hospital/Dashboard.jsx';
+import HospitalDashboard from './pages/Hospital/EmergencyDashboard.jsx';
 import BloodReceive from './pages/User/BloodReceive.jsx';
 
 import {createBrowserRouter, RouterProvider} from 'react-router-dom';
 import PharmacyAuth from './pages/Pharmacy/PharmacyAuth.jsx';
-import Dashboard from './pages/Hospital/Dashboard.jsx';
+import EmergencyDashboard from './pages/Hospital/EmergencyDashboard.jsx';
 
 const router = createBrowserRouter([
     {
@@ -61,7 +61,7 @@ const router = createBrowserRouter([
             },
             {
                 path: '/hospital/emergencies',
-                element: <Dashboard />,
+                element: <EmergencyDashboard />,
             },
             
             {

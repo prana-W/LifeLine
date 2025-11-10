@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { LogOut, User, Activity, Droplet, LayoutDashboard } from 'lucide-react';
+import {useNavigate} from "react-router-dom";
 
 const Header = () => {
     const [role, setRole] = useState(null);
@@ -9,6 +10,8 @@ const Header = () => {
         const storedRole = localStorage.getItem('role');
         setRole(storedRole);
     });
+
+    const navigate = useNavigate();
 
     const handleLogout = async () => {
         if (!role || role === 'null') return;
