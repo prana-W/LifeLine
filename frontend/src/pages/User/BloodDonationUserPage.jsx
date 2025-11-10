@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Card,
   CardHeader,
@@ -8,6 +8,11 @@ import {
 import { Heart, Droplet, Calendar, Medal, MapPin, Phone, User, Activity } from "lucide-react";
 
 export default function UserDonationPage() {
+
+  // ✅ MODAL STATES
+  const [donateModal, setDonateModal] = useState(false);
+  const [learnModal, setLearnModal] = useState(false);
+
   const user = {
     name: "Ashutosh Rawat",
     phoneNumber: "9876543210",
@@ -61,7 +66,6 @@ export default function UserDonationPage() {
           />
         </svg>
         
-        {/* Floating Icons on Left */}
         <div className="absolute top-[15%] left-6 animate-[float_6s_ease-in-out_infinite]">
           <Heart className="w-10 h-10 text-red-400/60" fill="currentColor" />
         </div>
@@ -76,7 +80,7 @@ export default function UserDonationPage() {
         </div>
       </div>
 
-      {/* RIGHT SIDE DECORATIVE CURVE WITH ICONS */}
+      {/* RIGHT SIDE DECORATIVE CURVE */}
       <div className="hidden lg:block absolute right-0 top-0 h-full w-32 pointer-events-none">
         <svg className="absolute inset-0 w-full h-full" viewBox="0 0 120 1200" preserveAspectRatio="none">
           <defs>
@@ -93,7 +97,6 @@ export default function UserDonationPage() {
           />
         </svg>
         
-        {/* Floating Icons on Right */}
         <div className="absolute top-[20%] right-6 animate-[float_7s_ease-in-out_infinite_0.5s]">
           <Droplet className="w-9 h-9 text-red-500/60" fill="currentColor" />
         </div>
@@ -108,7 +111,7 @@ export default function UserDonationPage() {
         </div>
       </div>
 
-      {/* Floating Animation Keyframes */}
+      {/* Animations */}
       <style>{`
         @keyframes float {
           0%, 100% { transform: translateY(0px) rotate(0deg); }
@@ -117,6 +120,10 @@ export default function UserDonationPage() {
         @keyframes wave {
           0%, 100% { transform: translateX(0px); }
           50% { transform: translateX(-10px); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: scale(0.95); }
+          to { opacity: 1; transform: scale(1); }
         }
       `}</style>
 
@@ -138,19 +145,31 @@ export default function UserDonationPage() {
             Track your donations and see your real impact.
           </p>
           <div className="flex gap-4 mt-6">
-            <button className="px-6 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl shadow-md transition-all hover:scale-105">
+            
+            {/* ✅ DONATE NOW BUTTON */}
+            <button
+              onClick={() => setDonateModal(true)}
+              className="px-6 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl shadow-md transition-all hover:scale-105"
+            >
               Donate Now
             </button>
-            <button className="px-6 py-2 border border-white/60 text-white font-semibold rounded-xl backdrop-blur-sm hover:bg-white/20 transition-all">
+
+            {/* ✅ LEARN MORE BUTTON */}
+            <button
+              onClick={() => setLearnModal(true)}
+              className="px-6 py-2 border border-white/60 text-white font-semibold rounded-xl backdrop-blur-sm hover:bg-white/20 transition-all"
+            >
               Learn More
             </button>
           </div>
         </div>
       </section>
 
-      {/* MAIN CONTENT */}
+      {/* MAIN CONTENT (UNCHANGED) */}
       <div className="max-w-4xl w-full mx-auto px-4 py-10 flex flex-col gap-8 relative z-10">
-        
+
+        {/* your whole remaining UI stays EXACTLY the same */}
+
         {/* HEADER */}
         <div className="text-center">
           <h1 className="text-3xl font-bold text-red-700 flex items-center justify-center gap-3">
@@ -164,6 +183,8 @@ export default function UserDonationPage() {
 
         {/* PROFILE + NEXT ELIGIBLE */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          {/* Profile Card */}
           <Card className="bg-white/90 backdrop-blur-md shadow-xl border-red-200 hover:shadow-2xl transition-all hover:scale-[1.02]">
             <CardHeader>
               <CardTitle className="text-red-700 flex items-center gap-2">
@@ -190,6 +211,7 @@ export default function UserDonationPage() {
             </CardContent>
           </Card>
 
+          {/* Next Eligible */}
           <Card className="bg-white/90 backdrop-blur-md shadow-xl border-red-200 hover:shadow-2xl transition-all hover:scale-[1.02]">
             <CardHeader>
               <CardTitle className="text-red-700 flex items-center gap-2">
@@ -294,6 +316,64 @@ export default function UserDonationPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* ✅ DONATE NOW MODAL */}
+      {donateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => setDonateModal(false)}
+          />
+          
+          <div className="relative bg-white rounded-2xl p-8 max-w-md w-full mx-6 shadow-2xl animate-[fadeIn_0.25s_ease]">
+            <h2 className="text-2xl font-bold text-red-700 mb-3">
+              Thank You for Your Initiative!
+            </h2>
+            <p className="text-gray-700 leading-relaxed">
+              Kindly visit your nearest hospital to donate blood.  
+              Your step can save someone’s life today.
+            </p>
+
+            <button
+              onClick={() => setDonateModal(false)}
+              className="mt-6 w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-xl font-semibold shadow-lg"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ✅ LEARN MORE MODAL */}
+      {learnModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => setLearnModal(false)}
+          />
+
+          <div className="relative bg-white rounded-2xl p-8 max-w-md w-full mx-6 shadow-2xl animate-[fadeIn_0.25s_ease]">
+            <h2 className="text-2xl font-bold text-red-700 mb-3">
+              Why Donate Blood?
+            </h2>
+
+            <ul className="list-disc pl-5 text-gray-700 leading-relaxed space-y-2">
+              <li>One donation can save up to <b>three lives</b>.</li>
+              <li>Your donated blood replenishes within 48 hours.</li>
+              <li>Helps patients in accidents, surgeries, and cancer care.</li>
+              <li>You become part of a life-saving community.</li>
+            </ul>
+
+            <button
+              onClick={() => setLearnModal(false)}
+              className="mt-6 w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-xl font-semibold shadow-lg"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
