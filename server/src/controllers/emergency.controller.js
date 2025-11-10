@@ -114,89 +114,34 @@ const createEmergencyAlert = asyncHandler(async (req, res) => {
 });
 
 const callAmbulance = asyncHandler(async (req, res) => {
-    const { pincode, latitude, longitude, location, city, state } = req.body;
+
     const userId = req.userId;
 
-    console.log('Received ambulance request:', { pincode, latitude, longitude, city, state });
+    const user = await User.findById(userId);
 
-    // Validate required fields
-    if (!pincode || !latitude || !longitude) {
-        throw new ApiError(statusCode.BAD_REQUEST, 'Missing required location details');
+    if (!user) {
+        throw new ApiError(statusCode.BAD_REQUEST, 'User not found!');
     }
 
-    if (!location) {
-        throw new ApiError(statusCode.BAD_REQUEST, 'Location address is required');
-    }
+    const {pinCode} = user;
 
     // Find all hospitals in the area
-    const hospitals = await Hospital.find({ pinCode: pincode });
+    const hospitals = await Hospital.find({ pinCode: pinCode });
 
     // Create ambulance request record
     const ambulanceRequest = await Emergency.create({
         user: userId,
         type: 'ambulance',
         hospitalsNotified: hospitals.map((h) => h._id),
-        pinCode: pincode,
-        location: {
-            latitude: parseFloat(latitude),
-            longitude: parseFloat(longitude),
-            address: location,
-            city: city || 'Unknown',
-            state: state || 'Unknown',
-        },
+        pinCode: pinCode,
         timestamp: new Date(),
         status: 'pending',
     });
 
-    console.log('Ambulance request created:', ambulanceRequest._id);
-
-    // Prepare response
-    let responseMessage = '';
-    let responseData = {
-        requestId: ambulanceRequest._id,
-        type: 'ambulance',
-        hospitalsCount: hospitals.length,
-        location: {
-            pinCode: pincode,
-            coordinates: {
-                latitude: parseFloat(latitude),
-                longitude: parseFloat(longitude)
-            },
-            address: location,
-            city: city || 'Unknown',
-            state: state || 'Unknown',
-        },
-        timestamp: ambulanceRequest.timestamp,
-    };
-
-    if (!hospitals.length) {
-        responseMessage = `Ambulance request registered. Warning: No hospitals found in pincode ${pincode}. Request has been forwarded to central emergency services.`;
-        responseData.warning = `No hospitals found in pincode: ${pincode}`;
-        responseData.hospitalsNotified = false;
-    } else {
-        responseMessage = `Ambulance request sent to ${hospitals.length} nearby hospital(s). Help is on the way!`;
-        responseData.hospitalsNotified = true;
-        responseData.hospitals = hospitals.map(h => ({
-            id: h._id,
-            name: h.name,
-            contact: h.contact,
-            address: h.address
-        }));
-
-        // TODO: Send real-time notifications to hospitals
-        // await notifyHospitalsForAmbulance(hospitals, ambulanceRequest);
-        // This could include:
-        // - WebSocket notifications
-        // - SMS alerts
-        // - Push notifications to hospital staff app
-        // - Email notifications
-    }
-
     return res.status(statusCode.CREATED).json(
         new ApiResponse(
             statusCode.CREATED,
-            responseMessage,
-            responseData
+            'Ambulance request was raised!'
         )
     );
 });
@@ -318,121 +263,48 @@ const getBloodRequestDetails = asyncHandler(async (req, res) => {
     );
 });
 
-/**
- * Get user's blood request history
- * GET /api/v1/user/blood-requests
- */
-const getMyBloodRequests = asyncHandler(async (req, res) => {
-    const userId = req.userId;
-    const { status } = req.query;
-
-    const query = {
-        user: userId,
-        type: 'blood'
-    };
-
-    if (status) {
-        query.status = status;
-    }
-
-    const bloodRequests = await Emergency.find(query)
-        .populate('hospitalsNotified', 'name address contact')
-        .sort({ createdAt: -1 });
-
-    const grouped = {
-        pending: bloodRequests.filter(r => r.status === 'pending'),
-        responding: bloodRequests.filter(r => r.status === 'responding'),
-        resolved: bloodRequests.filter(r => r.status === 'resolved'),
-        cancelled: bloodRequests.filter(r => r.status === 'cancelled'),
-    };
-
-    return res.status(statusCode.OK).json(
-        new ApiResponse(
-            statusCode.OK,
-            'Blood request history retrieved successfully',
-            {
-                totalRequests: bloodRequests.length,
-                summary: {
-                    pending: grouped.pending.length,
-                    responding: grouped.responding.length,
-                    resolved: grouped.resolved.length,
-                    cancelled: grouped.cancelled.length,
-                },
-                requests: bloodRequests.map(request => ({
-                    requestId: request._id,
-                    bloodType: request.bloodRequest.bloodType,
-                    unitsRequired: request.bloodRequest.unitsRequired,
-                    urgencyLevel: request.bloodRequest.urgencyLevel,
-                    patientName: request.bloodRequest.patientName,
-                    status: request.status,
-                    location: {
-                        pinCode: request.pinCode,
-                        address: request.location.address,
-                        city: request.location.city,
-                    },
-                    hospitalsNotified: request.hospitalsNotified.length,
-                    createdAt: request.createdAt,
-                    resolvedAt: request.resolvedAt,
-                }))
-            }
-        )
-    );
-});
 
 /**
- * Cancel blood request
- * PATCH /api/v1/user/blood-request/:requestId/cancel
+ * @desc   Delete a specific emergency by ID (hospital can mark it as consumed)
+ * @route  DELETE /api/hospital/emergencies/:emergencyId
+ * @access Private (Hospital)
  */
-const cancelBloodRequest = asyncHandler(async (req, res) => {
-    const { requestId } = req.params;
-    const userId = req.userId;
+const deleteEmergency = asyncHandler(async (req, res) => {
+    const { emergencyId } = req.params;
 
-    const bloodRequest = await Emergency.findOne({
-        _id: requestId,
-        user: userId,
-        type: 'blood'
-    });
-
-    if (!bloodRequest) {
-        throw new ApiError(
-            statusCode.NOT_FOUND,
-            'Blood request not found or you do not have permission'
-        );
+    // Find emergency
+    const emergency = await Emergency.findById(emergencyId);
+    if (!emergency) {
+        throw new ApiError(statusCode.NOT_FOUND, 'Emergency not found');
     }
 
-    if (bloodRequest.status === 'resolved') {
-        throw new ApiError(
-            statusCode.CONFLICT,
-            'Cannot cancel a blood request that has already been resolved'
-        );
-    }
-
-    if (bloodRequest.status === 'cancelled') {
-        throw new ApiError(
-            statusCode.CONFLICT,
-            'Blood request has already been cancelled'
-        );
-    }
-
-    bloodRequest.status = 'cancelled';
-    bloodRequest.resolvedAt = new Date();
-    await bloodRequest.save();
-
-    return res.status(statusCode.OK).json(
-        new ApiResponse(
-            statusCode.OK,
-            'Blood request cancelled successfully',
-            {
-                requestId: bloodRequest._id,
-                bloodType: bloodRequest.bloodRequest.bloodType,
-                status: 'cancelled',
-                cancelledAt: bloodRequest.resolvedAt,
+    // 🧹 Delete associated local video file if exists
+    if (emergency.audioVideoUrl) {
+        const filePath = path.join(process.cwd(), emergency.audioVideoUrl);
+        try {
+            if (fs.existsSync(filePath)) {
+                fs.unlinkSync(filePath);
+                console.log(`🧹 Deleted emergency file: ${filePath}`);
             }
-        )
-    );
+        } catch (error) {
+            console.error('Error deleting file:', error);
+        }
+    }
+
+    // Delete record
+    await Emergency.findByIdAndDelete(emergencyId);
+
+    return res
+        .status(statusCode.OK)
+        .json(
+            new ApiResponse(
+                statusCode.OK,
+                'Emergency record deleted successfully.',
+                { deletedEmergencyId: emergencyId }
+            )
+        );
 });
 
 export { createEmergencyAlert, callAmbulance, upload,  requestBloodEmergency,
-    getBloodRequestDetails,
-    getMyBloodRequests,
-    cancelBloodRequest};
+    getBloodRequestDetails, deleteEmergency
+};
