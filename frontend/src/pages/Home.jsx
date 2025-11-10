@@ -84,7 +84,7 @@ export default function HomePage() {
 
       {/* FOOTER */}
       <footer className="text-center py-6 text-teal-200 text-sm bg-[#0B3B37]">
-        © 2025 MediBridge Lifeline System
+        © 2025 Lifeline
       </footer>
     </div>
   );

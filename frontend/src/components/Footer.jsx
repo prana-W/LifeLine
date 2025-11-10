@@ -61,7 +61,7 @@ const roleConfig = {
   }
 };
 
-export default function MediBridgeFooter() {
+export default function Footer() {
   const [visitorCount, setVisitorCount] = useState(0);
   const [displayCount, setDisplayCount] = useState(0);
   const [loading, setLoading] = useState(true);
