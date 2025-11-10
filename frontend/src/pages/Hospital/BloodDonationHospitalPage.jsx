@@ -33,16 +33,16 @@ export default function BloodDonation() {
   // -----------------------------------
   const handleFetchUser = async () => {
     if (!phone.trim()) return toast.error("Enter phone number!");
-
+    
     setLoading(true);
     setMessage({ type: "", text: "" });
-
+    
     try {
       const { success, data, message } = await api.get(`/user/${phone}`);
-
+      
       if (success) {
         setUser(data);
-
+        
         toast.success("User found!", {
           duration: 1200,
           className: "bg-green-500 text-white font-semibold",
@@ -50,7 +50,7 @@ export default function BloodDonation() {
       } else {
         setUser(null);
         setMessage({ type: "error", text: message || "User not found!" });
-
+        
         toast.error("User not found!", {
           duration: 1300,
           className: "bg-red-500 text-white",
@@ -58,7 +58,7 @@ export default function BloodDonation() {
       }
     } catch {
       setMessage({ type: "error", text: "Network error. Try again." });
-
+      
       toast.error("Network error!", {
         duration: 1200,
       });
@@ -66,24 +66,24 @@ export default function BloodDonation() {
       setLoading(false);
     }
   };
-
+  
   // -----------------------------------
   // ✅ SAVE BLOOD DONATION
   // -----------------------------------
   const handleDonationSubmit = async () => {
     if (!donationQty.trim()) return toast.error("Enter donated quantity!");
-
+    
     const payload = {
       donorId: user._id,
       quantity: Number(donationQty),
     };
-
+    
     try {
       const { success, message } = await api.post(
         "/hospital/addBloodDonation",
         payload
       );
-
+      
       if (success) {
         toast.success("Donation recorded!", {
           duration: 1400,
@@ -103,18 +103,18 @@ export default function BloodDonation() {
   // -----------------------------------
   const handleReceiveSubmit = async () => {
     if (!receivedQty.trim()) return toast.error("Enter received quantity!");
-
+    
     const payload = {
       receiverId: user._id,
       quantity: Number(receivedQty),
     };
-
+    
     try {
       const { success, message } = await api.post(
         "/hospital/giveBloodDonation",
         payload
       );
-
+      
       if (success) {
         toast.success("Receive entry saved!", {
           duration: 1400,
@@ -128,14 +128,15 @@ export default function BloodDonation() {
       toast.error(err?.message || "Network error");
     }
   };
-
+  
   return (
     <div
-      className="min-h-screen flex items-center justify-center relative p-6 overflow-hidden"
-      style={{
-        background:
-          "linear-gradient(135deg, rgba(74,144,226,0.08), rgba(74,210,204,0.08))",
-      }}
+    className="min-h-screen flex items-center justify-center relative p-6 overflow-hidden"
+    style={{
+      background:
+      "linear-gradient(135deg, rgba(74,144,226,0.08), rgba(74,210,204,0.08))",
+    }}
+    
     >
       {/* ✅ LIGHT GRID (subtle + matching footer blue) */}
       <div className="absolute inset-0 opacity-40 pointer-events-none">

@@ -63,10 +63,7 @@ const router = createBrowserRouter([
                 path: '/user/bloodreceive',
                 element: <BloodReceive />,
             },
-            {
-                path: '/user/ambulancecall',
-                element: <AmbulanceCall />,
-            },
+            
             {
                 path: '*',
                 element: <NotFound />,
