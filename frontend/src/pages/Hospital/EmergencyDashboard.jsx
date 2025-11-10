@@ -144,9 +144,23 @@ export default function EmergencyDashboard() {
                                     <AlertTriangle className="text-red-400 w-8 h-8" />
                                     <h3 className="text-xl font-semibold">Emergency Alert</h3>
                                 </div>
-                                <span className="text-xs bg-yellow-400/20 text-yellow-100 px-2 py-1 rounded">
-                  {alert.status || "pending"}
-                </span>
+
+                                <div className="flex flex-col items-end gap-1">
+
+
+                                    {/* Type Tag */}
+                                    <span
+                                        className={`text-xs px-2 py-1 rounded capitalize ${
+                                            alert.type === "ambulance"
+                                                ? "bg-blue-400/20 text-blue-100"
+                                                : alert.type === "blood"
+                                                    ? "bg-pink-400/20 text-pink-100"
+                                                    : "bg-orange-400/20 text-orange-100"
+                                        }`}
+                                    >
+          {alert.type}
+        </span>
+                                </div>
                             </div>
 
                             {/* User Info */}
@@ -174,22 +188,36 @@ export default function EmergencyDashboard() {
                                 <p className="flex items-center gap-2">
                                     <Hospital className="w-5 h-5" />
                                     <span>
-                    Notified Hospitals:{" "}
+          Notified Hospitals:{" "}
                                         {alert.hospitalsNotified?.length ? alert.hospitalsNotified.length : "None"}
-                  </span>
+        </span>
                                 </p>
                                 <p className="flex items-center gap-2">
                                     <Clock className="w-5 h-5" />
                                     <span>
-                    {alert.createdAt
-                        ? new Date(alert.createdAt).toLocaleString()
-                        : "Time not available"}
-                  </span>
+          {alert.createdAt
+              ? new Date(alert.createdAt).toLocaleString()
+              : "Time not available"}
+        </span>
                                 </p>
                             </div>
 
-                            {/* Audio/Video */}
-                            {alert.audioVideoUrl ? (
+                            {/* Media / Map Display */}
+                            {alert.type === "ambulance" ? (
+                                alert.location?.latitude && alert.location?.longitude ? (
+                                    <iframe
+                                        title="User Live Location"
+                                        width="100%"
+                                        height="240"
+                                        className="rounded-lg border border-white/20 shadow-md"
+                                        src={`https://www.google.com/maps?q=${alert.location.latitude},${alert.location.longitude}&z=15&output=embed`}
+                                        allowFullScreen
+                                        loading="lazy"
+                                    ></iframe>
+                                ) : (
+                                    <p className="text-white/70 italic">Location data unavailable.</p>
+                                )
+                            ) : alert.audioVideoUrl ? (
                                 <video
                                     src={`${import.meta.env.VITE_SERVER_BASE_URL}${alert.audioVideoUrl}`}
                                     controls
@@ -231,6 +259,7 @@ export default function EmergencyDashboard() {
                             </div>
                         </div>
                     ))}
+
                 </div>
             </section>
 

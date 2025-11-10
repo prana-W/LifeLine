@@ -114,37 +114,75 @@ const createEmergencyAlert = asyncHandler(async (req, res) => {
 });
 
 const callAmbulance = asyncHandler(async (req, res) => {
-
     const userId = req.userId;
+    const { pincode, latitude, longitude, location, city, state } = req.body;
+
+    console.log('Received ambulance request:', { userId, pincode, latitude, longitude, city, state });
+
+    if (!pincode || !latitude || !longitude) {
+        throw new ApiError(statusCode.BAD_REQUEST, 'Missing required location details');
+    }
 
     const user = await User.findById(userId);
-
     if (!user) {
         throw new ApiError(statusCode.BAD_REQUEST, 'User not found!');
     }
 
-    const {pinCode} = user;
+    // Find hospitals in same pincode
+    const hospitals = await Hospital.find({ pinCode: pincode });
 
-    // Find all hospitals in the area
-    const hospitals = await Hospital.find({ pinCode: pinCode });
-
-    // Create ambulance request record
+    // Create ambulance emergency record
     const ambulanceRequest = await Emergency.create({
         user: userId,
         type: 'ambulance',
         hospitalsNotified: hospitals.map((h) => h._id),
-        pinCode: pinCode,
+        pinCode: pincode,
+        location: {
+            latitude: parseFloat(latitude),
+            longitude: parseFloat(longitude),
+            address: location,
+            city,
+            state,
+        },
         timestamp: new Date(),
         status: 'pending',
     });
 
+    console.log('Ambulance request created:', ambulanceRequest._id);
+
+    let responseMessage = '';
+    let responseData = {
+        emergencyId: ambulanceRequest._id,
+        type: 'ambulance',
+        hospitalsCount: hospitals.length,
+        location: {
+            pinCode: pincode,
+            coordinates: {
+                latitude: parseFloat(latitude),
+                longitude: parseFloat(longitude),
+            },
+            address: location,
+        },
+    };
+
+    if (!hospitals.length) {
+        responseMessage = `Ambulance request registered. Warning: No hospitals found in pincode ${pincode}. Emergency services will be notified manually.`;
+        responseData.warning = `No hospitals found in pincode: ${pincode}`;
+        responseData.hospitalsNotified = false;
+    } else {
+        responseMessage = 'Ambulance request created and nearby hospitals notified.';
+        responseData.hospitalsNotified = true;
+        // TODO: Notify hospitals via WebSocket, SMS, Email, etc.
+        // await notifyHospitals(hospitals, ambulanceRequest);
+    }
+
     return res.status(statusCode.CREATED).json(
-        new ApiResponse(
-            statusCode.CREATED,
-            'Ambulance request was raised!'
-        )
+        new ApiResponse(statusCode.CREATED, responseMessage, responseData)
     );
 });
+
+
+
 
 /**
  * Request blood emergency
