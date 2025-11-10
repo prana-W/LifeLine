@@ -40,7 +40,7 @@ const router = createBrowserRouter([
                 element: <Stock />,
             },
             {
-                path: '/Hospital/auth',
+                path: '/hospital/auth',
                 element: <HospitalAuth />,
             },
             {
@@ -56,11 +56,11 @@ const router = createBrowserRouter([
                 element: <BloodDonationUserPage />,
             },
             {
-                path: '/user/bloodreceive',
+                path: '/user/receiveBlood',
                 element: <BloodReceive />,
             },
             {
-                path: '/hospital/Dashboard',
+                path: '/hospital/emergencies',
                 element: <Dashboard />,
             },
             

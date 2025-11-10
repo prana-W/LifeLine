@@ -88,7 +88,7 @@ export default function Footer() {
     };
 
     fetchVisitors();
-  }, [api]);
+  }, []);
 
   // Animate counter
   useEffect(() => {

@@ -162,8 +162,8 @@ export default function HospitalAuth() {
       } else {
         setMessage({ type: 'error', text: data.message || 'Login failed!' });
       }
-    } catch {
-      setMessage({ type: 'error', text: 'Network error. Please try again.' });
+    } catch (err) {
+      setMessage({ type: 'error', text: err?.message || 'Login failed!' });
     } finally {
       setLoading(false);
     }
@@ -197,8 +197,8 @@ export default function HospitalAuth() {
       } else {
         setMessage({ type: 'error', text: data.message || 'Registration failed!' });
       }
-    } catch {
-      setMessage({ type: 'error', text: 'Network error. Please try again.' });
+    } catch (err) {
+      setMessage({ type: 'error', text: err?.message });
     } finally {
       setLoading(false);
     }

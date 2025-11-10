@@ -65,7 +65,7 @@ export default function Dashboard() {
 
     const intervalId = setInterval(() => {
       fetchEmergencies({ showSpinner: false });
-    }, 10000); // 10 seconds
+    }, 5000); // 5 seconds
 
     return () => clearInterval(intervalId);
   }, [fetchEmergencies]);

@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
-import { Ambulance, Loader2, MapPin } from 'lucide-react';
+import { Ambulance, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import useApi from "@/hooks/useApi.js";
 
 export default function CallAmbulanceButton() {
     const [isProcessing, setIsProcessing] = useState(false);
-
-    const getAuthToken = () => {
-        return localStorage.getItem('authToken') || '';
-    };
+    const api = useApi();
 
     const getLocationData = async () => {
         return new Promise((resolve, reject) => {
@@ -33,64 +31,42 @@ export default function CallAmbulanceButton() {
                         const data = await response.json();
 
                         resolve({
-                            latitude: latitude,
-                            longitude: longitude,
+                            latitude,
+                            longitude,
                             pincode: data.address?.postcode || 'Unknown',
                             city: data.address?.city || data.address?.town || data.address?.village || 'Unknown',
                             state: data.address?.state || 'Unknown',
                             fullAddress: data.display_name
                         });
-                    } catch (err) {
+                    } catch {
                         reject(new Error('Failed to fetch location details'));
                     }
                 },
-                (err) => {
-                    reject(new Error('Failed to get location'));
-                }
+                () => reject(new Error('Failed to get location'))
             );
         });
     };
 
     const handleCallAmbulance = async () => {
         setIsProcessing(true);
-
         try {
-            // Get location data
             toast.info('Getting your location...');
             const locationData = await getLocationData();
 
-            // Send ambulance request
-            const token = getAuthToken();
-
-            const response = await fetch('/api/v1/user/ambulance', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    pincode: locationData.pincode,
-                    latitude: locationData.latitude,
-                    longitude: locationData.longitude,
-                    location: locationData.fullAddress,
-                    city: locationData.city,
-                    state: locationData.state
-                })
+            const { success, message } = await api.post('/user/ambulance', {
+                pincode: locationData.pincode,
+                latitude: locationData.latitude,
+                longitude: locationData.longitude,
+                location: locationData.fullAddress,
+                city: locationData.city,
+                state: locationData.state
             });
 
-            const result = await response.json();
-
-            if (response.ok && result.success) {
-                toast.success(result.message || 'Ambulance has been called!');
-
-                // Show additional info if hospitals were notified
-                if (result.data.hospitalsNotified && result.data.hospitalsCount > 0) {
-                    toast.info(`${result.data.hospitalsCount} hospital(s) notified in your area`);
-                }
+            if (success) {
+                toast.success(message || 'Ambulance has been called!');
             } else {
-                toast.error(result.message || 'Failed to call ambulance');
+                toast.error(message || 'Failed to call ambulance');
             }
-
         } catch (error) {
             console.error('Ambulance call error:', error);
             toast.error(error.message || 'Failed to call ambulance');
@@ -103,17 +79,24 @@ export default function CallAmbulanceButton() {
         <button
             onClick={handleCallAmbulance}
             disabled={isProcessing}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-bold py-6 px-8 rounded-xl transition-all transform hover:scale-105 active:scale-95 shadow-lg disabled:transform-none text-xl flex items-center justify-center gap-3"
+            className="
+                w-full bg-white text-blue-600 border border-blue-300
+                font-semibold py-5 px-8 rounded-xl
+                hover:bg-blue-50 active:bg-blue-100
+                disabled:opacity-60 disabled:cursor-not-allowed
+                flex items-center justify-center gap-3
+                transition-all duration-200
+            "
         >
             {isProcessing ? (
                 <>
-                    <Loader2 className="w-6 h-6 animate-spin" />
+                    <Loader2 className="w-5 h-5 animate-spin" />
                     Calling Ambulance...
                 </>
             ) : (
                 <>
-                    <Ambulance className="w-6 h-6" />
-                    🚑 Call Ambulance
+                    <Ambulance className="w-5 h-5" />
+                    Call Ambulance
                 </>
             )}
         </button>

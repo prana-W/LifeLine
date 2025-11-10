@@ -291,4 +291,22 @@ const cancelDonation = asyncHandler(async (req, res) => {
     );
 });
 
-export {getUserByPhoneNumber, registerOrganDonor, searchAvailableOrgans, requestOrgan, getMyDonations, cancelDonation};
+const getUser = asyncHandler(async (req, res) => {
+
+    const userId = req.userId;
+
+    if (!userId) {
+        throw new ApiError(statusCode.NOT_FOUND, `User with id ${userId}`);
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+        throw new ApiError(statusCode.NOT_FOUND, `User with id ${userId}`);
+    }
+
+    return res.status(statusCode.OK).json(new ApiResponse(statusCode.OK, 'User fetched', user));
+
+})
+
+export {getUserByPhoneNumber, registerOrganDonor, searchAvailableOrgans, requestOrgan, getMyDonations, cancelDonation, getUser};

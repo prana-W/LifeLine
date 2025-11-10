@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import {getUserByPhoneNumber} from '../controllers/user/user.controller.js';
+import {getUserByPhoneNumber, getUser} from '../controllers/user/user.controller.js';
 import {verifyAccessToken} from '../middlewares/index.js';
 import {
     createEmergencyAlert,
@@ -10,6 +10,8 @@ import {
 const user = Router();
 
 user.route('/:phoneNumber').get(getUserByPhoneNumber);
+
+user.route('/').get(verifyAccessToken, getUser);
 user.post(
     '/emergency',
     verifyAccessToken,
