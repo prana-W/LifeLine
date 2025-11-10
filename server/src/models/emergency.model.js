@@ -1,4 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
+import AnalyticsService from '../services/analytics.service.js';
 
 const emergencySchema = new Schema(
     {
@@ -75,6 +76,45 @@ const emergencySchema = new Schema(
         },
     }
 );
+
+// Analytics tracking - after emergency is created
+emergencySchema.post('save', async function(doc) {
+    try {
+        if (doc.pinCode) {
+            await AnalyticsService.updateEmergency(
+                doc.pinCode,
+                doc.type,
+                doc.status
+            );
+
+            // If it's a blood request, also update blood analytics
+            if (doc.type === 'blood' && doc.bloodRequest && doc.bloodRequest.bloodType) {
+                await AnalyticsService.updateBloodDonation(
+                    doc.pinCode,
+                    doc.bloodRequest.bloodType,
+                    'received'
+                );
+            }
+        }
+    } catch (error) {
+        console.error('Error updating emergency analytics on save:', error);
+    }
+});
+
+// Analytics tracking - when emergency status is updated
+emergencySchema.post('findOneAndUpdate', async function(doc) {
+    try {
+        if (doc && doc.pinCode) {
+            await AnalyticsService.updateEmergency(
+                doc.pinCode,
+                doc.type,
+                doc.status
+            );
+        }
+    } catch (error) {
+        console.error('Error updating emergency analytics on update:', error);
+    }
+});
 
 const Emergency = mongoose.model('Emergency', emergencySchema);
 export default Emergency;
