@@ -1,17 +1,15 @@
 import { useState, useEffect } from 'react';
 import { LogOut, User, Activity, Droplet, LayoutDashboard } from 'lucide-react';
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
     const [role, setRole] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        // Check for role on every page refresh/redirect
         const storedRole = localStorage.getItem('role');
         setRole(storedRole);
     });
-
-    const navigate = useNavigate();
 
     const handleLogout = async () => {
         if (!role || role === 'null') return;
@@ -25,8 +23,7 @@ const Header = () => {
                     headers: {
                         'ngrok-skip-browser-warning': 'true'
                     },
-                },
-
+                }
             );
 
             if (!res.ok) {
@@ -35,7 +32,6 @@ const Header = () => {
         } catch (error) {
             console.error('Error during logout:', error);
         } finally {
-            // Always clear localStorage and redirect, even if API call fails
             localStorage.removeItem('accessToken');
             localStorage.setItem('role', 'null');
             setRole(null);
@@ -51,33 +47,33 @@ const Header = () => {
         switch (role) {
             case 'pharmacy':
                 return {
-                    bg: 'from-emerald-500/20 to-teal-500/20',
+                    gradient: 'from-emerald-700/50 via-emerald-800/50 to-teal-700/50',
                     border: 'border-emerald-400/30',
-                    text: 'text-emerald-100',
+                    text: 'text-emerald-50',
                     hover: 'hover:bg-emerald-400/20',
                     button: 'bg-emerald-500/80 hover:bg-emerald-600/80'
                 };
             case 'user':
                 return {
-                    bg: 'from-blue-500/20 to-indigo-500/20',
+                    gradient: 'from-blue-700/50 via-indigo-700/50 to-blue-800/50',
                     border: 'border-blue-400/30',
-                    text: 'text-blue-100',
+                    text: 'text-blue-50',
                     hover: 'hover:bg-blue-400/20',
                     button: 'bg-blue-500/80 hover:bg-blue-600/80'
                 };
             case 'hospital':
                 return {
-                    bg: 'from-red-500/20 to-rose-500/20',
+                    gradient: 'from-rose-700/50 via-red-700/50 to-rose-800/50',
                     border: 'border-red-400/30',
-                    text: 'text-red-100',
+                    text: 'text-red-50',
                     hover: 'hover:bg-red-400/20',
                     button: 'bg-red-500/80 hover:bg-red-600/80'
                 };
             default:
                 return {
-                    bg: 'from-purple-500/20 to-pink-500/20',
+                    gradient: 'from-purple-700/50 via-pink-700/50 to-purple-800/50',
                     border: 'border-purple-400/30',
-                    text: 'text-purple-100',
+                    text: 'text-purple-50',
                     hover: 'hover:bg-purple-400/20',
                     button: 'bg-purple-500/80 hover:bg-purple-600/80'
                 };
@@ -87,7 +83,6 @@ const Header = () => {
     const theme = getThemeColors();
 
     const renderNavigation = () => {
-        // Guest navigation - no role or role is 'null'
         if (!role || role === 'null') {
             return (
                 <button
@@ -100,7 +95,6 @@ const Header = () => {
             );
         }
 
-        // Role-based navigation for authenticated users
         switch (role) {
             case 'pharmacy':
                 return (
@@ -121,7 +115,6 @@ const Header = () => {
                         </button>
                     </>
                 );
-
             case 'user':
                 return (
                     <>
@@ -148,7 +141,6 @@ const Header = () => {
                         </button>
                     </>
                 );
-
             case 'hospital':
                 return (
                     <>
@@ -175,18 +167,19 @@ const Header = () => {
                         </button>
                     </>
                 );
-
             default:
                 return null;
         }
     };
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md">
-            <div className={`bg-gradient-to-r ${theme.bg} border-b ${theme.border} shadow-lg`}>
+        <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-lg">
+            <div
+                className={`bg-gradient-to-r ${theme.gradient} border-b ${theme.border} shadow-lg backdrop-saturate-150`}
+            >
                 <div className="container mx-auto px-6 py-4">
                     <div className="flex items-center justify-between">
-                        {/* Logo */}
+                        {/* Logo Section */}
                         <div
                             onClick={() => navigate('/')}
                             className="flex items-center gap-3 cursor-pointer group"
@@ -199,12 +192,12 @@ const Header = () => {
                             </h1>
                             {role && (
                                 <span className={`text-sm px-3 py-1 rounded-full ${theme.button} text-white font-medium capitalize`}>
-                  {role}
-                </span>
+                                    {role}
+                                </span>
                             )}
                         </div>
 
-                        {/* Navigation */}
+                        {/* Navigation Buttons */}
                         <nav className="flex items-center gap-2">
                             {renderNavigation()}
                         </nav>
