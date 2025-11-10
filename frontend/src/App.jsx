@@ -9,7 +9,6 @@ import BloodDonationHospitalPage from './pages/Hospital/BloodDonationHospitalPag
 import BloodDonationUserPage from './pages/User/BloodDonationUserPage.jsx';
 import HospitalDashboard from './pages/Hospital/Dashboard.jsx';
 import BloodReceive from './pages/User/BloodReceive.jsx';
-import Emergency from './pages/Hospital/Emergency.jsx';
 
 import {createBrowserRouter, RouterProvider} from 'react-router-dom';
 import PharmacyAuth from './pages/Pharmacy/PharmacyAuth.jsx';
