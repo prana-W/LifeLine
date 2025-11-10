@@ -1,8 +1,17 @@
 import React, { useCallback, useEffect, useState, useRef } from "react";
-import { AlertTriangle, Clock, MapPin, PhoneCall, Activity } from "lucide-react";
+import { 
+  AlertTriangle, 
+  Clock, 
+  MapPin, 
+  PhoneCall, 
+  Activity, 
+  CheckCircle2 
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 import useApi from "@/hooks/useApi";
+import { toast } from "sonner";
 
-export default function HospitalDashboard() {
+export default function Dashboard() {
   const api = useApi();
   const apiRef = useRef(api);
 
@@ -15,11 +24,15 @@ export default function HospitalDashboard() {
     apiRef.current = api;
   }, [api]);
 
-  // Fetcher with stable reference
+  // ✅ Fetcher with deletion support
   const fetchEmergencies = useCallback(async (opts = { showSpinner: false }) => {
     try {
       if (opts.showSpinner) setLoading(true);
-      const { data, success, message } = await apiRef.current.get("/hospital/getEmergency");
+
+      const { success, data, message } = await apiRef.current.get(
+        "/hospital/getEmergency"
+      );
+
       if (!success) {
         setError(message || "Failed to load emergencies");
         setEmergencies([]);
@@ -32,25 +45,34 @@ export default function HospitalDashboard() {
     } finally {
       if (opts.showSpinner) setLoading(false);
     }
-  }, []); // No dependencies - stable function
+  }, []);
 
-  // Initial load + poll every 10s
+  // ✅ Delete emergency
+  const handleSolve = async (id) => {
+    const { success } = await apiRef.current.delete(`/hospital/emergency/${id}`);
+
+    if (success) {
+      toast.success("Emergency marked as solved!");
+      setEmergencies((prev) => prev.filter((e) => e._id !== id));
+    } else {
+      toast.error("Failed to delete emergency");
+    }
+  };
+
+  // ✅ Initial fetch + auto-polling every 10 seconds
   useEffect(() => {
-    // Initial fetch with spinner
     fetchEmergencies({ showSpinner: true });
 
-    // Subsequent silent polling every 10 seconds
     const intervalId = setInterval(() => {
       fetchEmergencies({ showSpinner: false });
-    }, 5000);
+    }, 10000); // 10 seconds
 
-    return () => {
-      clearInterval(intervalId);
-    };
+    return () => clearInterval(intervalId);
   }, [fetchEmergencies]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0F766E] via-[#0E7490] to-[#134E4A] text-white p-8">
+      
       {/* PAGE HEADER */}
       <div className="flex items-center justify-between mb-10">
         <h1 className="text-4xl font-bold flex items-center gap-3">
@@ -74,15 +96,11 @@ export default function HospitalDashboard() {
         </h2>
 
         {/* Loading */}
-        {loading && (
-          <p className="text-lg text-teal-100">Loading emergency data...</p>
-        )}
+        {loading && <p className="text-lg text-teal-100">Loading emergency data...</p>}
 
         {/* Error */}
         {!loading && error && (
-          <p className="text-red-200 bg-red-500/20 p-3 rounded-lg max-w-xl">
-            {error}
-          </p>
+          <p className="text-red-200 bg-red-500/20 p-3 rounded-lg max-w-xl">{error}</p>
         )}
 
         {/* No emergencies */}
@@ -127,9 +145,24 @@ export default function HospitalDashboard() {
                 </p>
               </div>
 
-              <button className="mt-5 w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg transition">
-                Respond Now
-              </button>
+              {/* ✅ Solve + Delete */}
+              <div className="flex items-center justify-between mt-5">
+                <label className="flex items-center gap-2 text-white font-semibold">
+                  <input
+                    type="checkbox"
+                    className="scale-125 accent-red-500"
+                    onChange={() => handleSolve(alert._id)}
+                  />
+                  Mark as solved
+                </label>
+
+                <Button
+                  onClick={() => handleSolve(alert._id)}
+                  className="bg-red-600 hover:bg-red-700 text-white flex items-center gap-2"
+                >
+                  <CheckCircle2 className="w-5 h-5" /> Delete
+                </Button>
+              </div>
             </div>
           ))}
         </div>

@@ -9,10 +9,11 @@ import BloodDonationHospitalPage from './pages/Hospital/BloodDonationHospitalPag
 import BloodDonationUserPage from './pages/User/BloodDonationUserPage.jsx';
 import HospitalDashboard from './pages/Hospital/Dashboard.jsx';
 import BloodReceive from './pages/User/BloodReceive.jsx';
-import AmbulanceCall from './pages/Hospital/AmbulanceCall.jsx';
+import Emergency from './pages/Hospital/Emergency.jsx';
 
 import {createBrowserRouter, RouterProvider} from 'react-router-dom';
 import PharmacyAuth from './pages/Pharmacy/PharmacyAuth.jsx';
+import Dashboard from './pages/Hospital/Dashboard.jsx';
 
 const router = createBrowserRouter([
     {
@@ -56,12 +57,12 @@ const router = createBrowserRouter([
                 element: <BloodDonationUserPage />,
             },
             {
-                path: '/hospital/dashboard',
-                element: <HospitalDashboard />,
-            },
-            {
                 path: '/user/bloodreceive',
                 element: <BloodReceive />,
+            },
+            {
+                path: '/hospital/Dashboard',
+                element: <Dashboard />,
             },
             
             {
