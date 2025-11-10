@@ -1,4 +1,0 @@
-- Geolocation for extracting coordinates
-- Openstreet api for getting zipcode
-- audio api for beep and alert
-- 
