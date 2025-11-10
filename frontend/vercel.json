@@ -10,7 +10,14 @@
     {
       "src": "/(.*)",
       "dest": "/",
-      "methods": ["GET","POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "PATCH",
+        "OPTIONS"
+      ],
       "headers": {
         "Access-Control-Allow-Origin": "https://hemielytral-unstoppably-audrina.ngrok-free.dev/api/v1",
         "Access-Control-Allow-Credentials": "true",
@@ -18,3 +25,4 @@
       }
     }
   ]
+}
