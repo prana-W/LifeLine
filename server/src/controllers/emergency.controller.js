@@ -278,9 +278,8 @@ const deleteEmergency = asyncHandler(async (req, res) => {
         throw new ApiError(statusCode.NOT_FOUND, 'Emergency not found');
     }
 
-    // 🧹 Delete associated local video file if exists
     if (emergency.audioVideoUrl) {
-        const filePath = path.join(process.cwd(), emergency.audioVideoUrl);
+        const filePath = path.join(process.cwd(), `/src${emergency.audioVideoUrl}`);
         try {
             if (fs.existsSync(filePath)) {
                 fs.unlinkSync(filePath);
@@ -305,6 +304,46 @@ const deleteEmergency = asyncHandler(async (req, res) => {
         );
 });
 
+
+const solveEmergency = asyncHandler(async (req, res) => {
+    const { emergencyId } = req.params;
+
+    const emergency = await Emergency.findById(emergencyId);
+    if (!emergency) {
+        throw new ApiError(statusCode.NOT_FOUND, "Emergency not found");
+    }
+
+    if (emergency.audioVideoUrl) {
+        const filePath = path.join(process.cwd(), "src", emergency.audioVideoUrl);
+
+        try {
+            if (fs.existsSync(filePath)) {
+                fs.unlinkSync(filePath);
+                console.log(`🧹 Deleted emergency file: ${filePath}`);
+            } else {
+                console.warn("⚠️ File not found at:", filePath);
+            }
+        } catch (error) {
+            console.error("❌ Error deleting file:", error);
+        }
+    }
+
+    await Emergency.findByIdAndUpdate(
+        emergencyId,
+        { status: "resolved", resolvedAt: new Date() },
+        { new: true }
+    );
+
+    return res.status(statusCode.OK).json(
+        new ApiResponse(
+            statusCode.OK,
+            "Emergency record marked as solved successfully.",
+            { deletedEmergencyId: emergencyId }
+        )
+    );
+});
+
+
 export { createEmergencyAlert, callAmbulance, upload,  requestBloodEmergency,
-    getBloodRequestDetails, deleteEmergency
+    getBloodRequestDetails, deleteEmergency, solveEmergency
 };

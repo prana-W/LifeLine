@@ -6,10 +6,11 @@ import {
     PhoneCall,
     Activity,
     CheckCircle2,
-    PlayCircle,
     Droplets,
     User,
     Hospital,
+    CheckCircle,
+    Map,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -48,35 +49,52 @@ export default function EmergencyDashboard() {
     }, []);
 
     const handleSolve = async (id) => {
-        const { success } = await apiRef.current.post(`/hospital/emergency/${id}`, {});
+        const { success } = await apiRef.current.put(`/hospital/solveEmergency/${id}`, {});
         if (success) {
             toast.success("Emergency marked as solved!");
-            setEmergencies((prev) => prev.filter((e) => e._id !== id));
+            // Move to resolved locally
+            setEmergencies((prev) =>
+                prev.map((e) =>
+                    e._id === id ? { ...e, status: "resolved", resolvedAt: new Date().toISOString() } : e
+                )
+            );
         } else {
-            toast.error("Failed to delete emergency");
+            toast.error("Failed to solve emergency");
         }
     };
 
     const handleDelete = async (id) => {
-        const { success } = await apiRef.current.delete(`/hospital/emergency/${id}`);
+        const { success } = await apiRef.current.delete(`/hospital/deleteEmergency/${id}`);
         if (success) {
-            toast.success("Emergency marked as solved!");
+            toast.success("Emergency was deleted!");
             setEmergencies((prev) => prev.filter((e) => e._id !== id));
         } else {
             toast.error("Failed to delete emergency");
         }
     };
 
+    // 🗺️ Open Google Maps with lat/long
+    const handleShowLocation = (latitude, longitude) => {
+        if (!latitude || !longitude) {
+            toast.error("Location data not available.");
+            return;
+        }
+        const mapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+        window.open(mapsUrl, "_blank");
+    };
 
     useEffect(() => {
         fetchEmergencies({ showSpinner: true });
-        const intervalId = setInterval(() => fetchEmergencies(), 10000); // 10s refresh
+        const intervalId = setInterval(() => fetchEmergencies(), 10000);
         return () => clearInterval(intervalId);
     }, [fetchEmergencies]);
 
+    // Separate Active and Resolved
+    const activeEmergencies = emergencies.filter((e) => e.status !== "resolved");
+    const resolvedEmergencies = emergencies.filter((e) => e.status === "resolved");
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-[#0F766E] via-[#0E7490] to-[#134E4A] text-white p-8">
-
             {/* HEADER */}
             <div className="flex items-center justify-between mb-10">
                 <h1 className="text-4xl font-bold flex items-center gap-3">
@@ -92,37 +110,43 @@ export default function EmergencyDashboard() {
                 </Button>
             </div>
 
-            {/* EMERGENCY LIST */}
-            <section>
-                <h2 className="text-2xl font-semibold mb-4 flex items-center gap-3">
+            {/* ACTIVE EMERGENCIES */}
+            <section className="mb-12">
+                <div className="flex items-center gap-3 mb-4">
                     <AlertTriangle className="w-7 h-7 text-red-300" />
-                    Active Emergencies
-                </h2>
+                    <h2 className="text-2xl font-semibold">Active Emergencies</h2>
+                    {!loading && (
+                        <span className="ml-2 text-sm bg-white/15 px-2 py-0.5 rounded-md">
+              {activeEmergencies.length}
+            </span>
+                    )}
+                </div>
 
-                {/* Loading State */}
                 {loading && <p className="text-lg text-teal-100">Loading emergency data...</p>}
 
-                {/* Error */}
                 {!loading && error && (
                     <p className="text-red-200 bg-red-500/20 p-3 rounded-lg max-w-xl">{error}</p>
                 )}
 
-                {/* No Data */}
-                {!loading && !error && emergencies.length === 0 && (
-                    <p className="text-teal-100 text-lg">No emergency alerts at the moment.</p>
+                {!loading && !error && activeEmergencies.length === 0 && (
+                    <p className="text-teal-100 text-lg">No active emergency alerts.</p>
                 )}
 
-                {/* Emergency Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-6">
-                    {emergencies.map((alert) => (
+                    {activeEmergencies.map((alert) => (
                         <div
                             key={alert._id}
                             className="bg-white/15 backdrop-blur-xl p-6 rounded-2xl border border-white/20 shadow-xl hover:scale-[1.02] transition"
                         >
                             {/* Header */}
-                            <div className="flex items-center gap-3 mb-4">
-                                <AlertTriangle className="text-red-400 w-8 h-8" />
-                                <h3 className="text-xl font-semibold">Emergency Alert</h3>
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-3">
+                                    <AlertTriangle className="text-red-400 w-8 h-8" />
+                                    <h3 className="text-xl font-semibold">Emergency Alert</h3>
+                                </div>
+                                <span className="text-xs bg-yellow-400/20 text-yellow-100 px-2 py-1 rounded">
+                  {alert.status || "pending"}
+                </span>
                             </div>
 
                             {/* User Info */}
@@ -131,12 +155,10 @@ export default function EmergencyDashboard() {
                                     <User className="w-5 h-5" />
                                     <span>{alert.user?.name || "Unknown User"}</span>
                                 </p>
-
                                 <p className="flex items-center gap-2">
                                     <PhoneCall className="w-5 h-5" />
                                     <span>{alert.user?.phoneNumber || "N/A"}</span>
                                 </p>
-
                                 <p className="flex items-center gap-2">
                                     <Droplets className="w-5 h-5" />
                                     <span>{alert.user?.bloodType || "N/A"}</span>
@@ -149,17 +171,13 @@ export default function EmergencyDashboard() {
                                     <MapPin className="w-5 h-5" />
                                     <span>{alert.location?.address || "Unknown location"}</span>
                                 </p>
-
                                 <p className="flex items-center gap-2">
                                     <Hospital className="w-5 h-5" />
                                     <span>
                     Notified Hospitals:{" "}
-                                        {alert.hospitalsNotified?.length
-                                            ? alert.hospitalsNotified.length
-                                            : "None"}
+                                        {alert.hospitalsNotified?.length ? alert.hospitalsNotified.length : "None"}
                   </span>
                                 </p>
-
                                 <p className="flex items-center gap-2">
                                     <Clock className="w-5 h-5" />
                                     <span>
@@ -170,26 +188,39 @@ export default function EmergencyDashboard() {
                                 </p>
                             </div>
 
-                            {/* Audio/Video Evidence */}
-                            {alert.audioVideoUrl && (
+                            {/* Audio/Video */}
+                            {alert.audioVideoUrl ? (
                                 <video
                                     src={`${import.meta.env.VITE_SERVER_BASE_URL}${alert.audioVideoUrl}`}
                                     controls
                                     className="w-full aspect-video max-h-64 object-cover rounded-lg border border-white/20 shadow-md"
                                 />
-
+                            ) : (
+                                <p className="text-white/70 italic">No video available.</p>
                             )}
 
                             {/* Actions */}
-                            <div className="flex items-center justify-between mt-5">
-                                <label className="flex items-center gap-2 text-white font-semibold">
-                                    <input
-                                        type="checkbox"
-                                        className="scale-125 accent-green-500"
-                                        onChange={() => handleSolve(alert._id)}
-                                    />
-                                    Mark as solved
-                                </label>
+                            <div className="flex flex-col sm:flex-row items-center justify-between mt-5 gap-3">
+                                <div className="flex flex-wrap items-center gap-3">
+                                    <Button
+                                        onClick={() =>
+                                            handleShowLocation(alert.location?.latitude, alert.location?.longitude)
+                                        }
+                                        className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
+                                    >
+                                        <Map className="w-5 h-5" />
+                                        Show Live Location
+                                    </Button>
+
+                                    <label className="flex items-center gap-2 text-white font-semibold">
+                                        <input
+                                            type="checkbox"
+                                            className="scale-125 accent-green-500"
+                                            onChange={() => handleSolve(alert._id)}
+                                        />
+                                        Mark as solved
+                                    </label>
+                                </div>
 
                                 <Button
                                     onClick={() => handleDelete(alert._id)}
@@ -203,6 +234,91 @@ export default function EmergencyDashboard() {
                 </div>
             </section>
 
+            {/* RESOLVED EMERGENCIES */}
+            <section>
+                <div className="flex items-center gap-3 mb-4">
+                    <CheckCircle className="w-7 h-7 text-emerald-300" />
+                    <h2 className="text-2xl font-semibold">Resolved Emergencies</h2>
+                    {!loading && (
+                        <span className="ml-2 text-sm bg-white/15 px-2 py-0.5 rounded-md">
+              {resolvedEmergencies.length}
+            </span>
+                    )}
+                </div>
+
+                {!loading && !error && resolvedEmergencies.length === 0 && (
+                    <p className="text-teal-100 text-lg">No resolved emergencies yet.</p>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-6">
+                    {resolvedEmergencies.map((alert) => (
+                        <div
+                            key={alert._id}
+                            className="bg-white/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20 shadow-xl"
+                        >
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-3">
+                                    <CheckCircle className="text-emerald-300 w-7 h-7" />
+                                    <h3 className="text-xl font-semibold">Resolved Emergency</h3>
+                                </div>
+                                <span className="text-xs bg-emerald-400/20 text-emerald-100 px-2 py-1 rounded">
+                  resolved
+                </span>
+                            </div>
+
+                            <div className="space-y-2 mb-4 text-white/90">
+                                <p className="flex items-center gap-2">
+                                    <User className="w-5 h-5" />
+                                    <span>{alert.user?.name || "Unknown User"}</span>
+                                </p>
+                                <p className="flex items-center gap-2">
+                                    <PhoneCall className="w-5 h-5" />
+                                    <span>{alert.user?.phoneNumber || "N/A"}</span>
+                                </p>
+                                <p className="flex items-center gap-2">
+                                    <Droplets className="w-5 h-5" />
+                                    <span>{alert.user?.bloodType || "N/A"}</span>
+                                </p>
+                            </div>
+
+                            <div className="space-y-2 text-white/80">
+                                <p className="flex items-center gap-2">
+                                    <MapPin className="w-5 h-5" />
+                                    <span>{alert.location?.address || "Unknown location"}</span>
+                                </p>
+                                <p className="flex items-center gap-2">
+                                    <Clock className="w-5 h-5" />
+                                    <span>
+                    Reported:{" "}
+                                        {alert.createdAt
+                                            ? new Date(alert.createdAt).toLocaleString()
+                                            : "Unknown"}
+                  </span>
+                                </p>
+                                {alert.resolvedAt && (
+                                    <p className="flex items-center gap-2">
+                                        <Clock className="w-5 h-5" />
+                                        <span>Resolved: {new Date(alert.resolvedAt).toLocaleString()}</span>
+                                    </p>
+                                )}
+                            </div>
+
+                            <p className="mt-4 text-white/70 italic">
+                                Media is hidden for resolved emergencies.
+                            </p>
+
+                            <div className="flex items-center justify-end mt-5">
+                                <Button
+                                    onClick={() => handleDelete(alert._id)}
+                                    className="bg-red-600 hover:bg-red-700 text-white flex items-center gap-2"
+                                >
+                                    <CheckCircle2 className="w-5 h-5" /> Delete
+                                </Button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
         </div>
     );
 }

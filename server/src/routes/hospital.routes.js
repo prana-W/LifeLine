@@ -4,7 +4,7 @@ import {
     giveBloodDonation
 } from '../controllers/hospital/hospital.controller.js';
 import {verifyAccessToken} from '../middlewares/index.js';
-import {deleteEmergency} from "../controllers/emergency.controller.js";
+import {deleteEmergency, solveEmergency} from "../controllers/emergency.controller.js";
 
 const hospitalRouter = Router();
 
@@ -15,10 +15,12 @@ hospitalRouter
 hospitalRouter
     .route('/getEmergency')
     .get(verifyAccessToken, getEmergenciesByHospital);
-
 hospitalRouter
-    .route('/deleteEmergency')
+    .route('/deleteEmergency/:emergencyId')
     .delete(verifyAccessToken, deleteEmergency);
+hospitalRouter
+    .route('/solveEmergency/:emergencyId')
+    .put(verifyAccessToken, solveEmergency);
 
 
 export default hospitalRouter;

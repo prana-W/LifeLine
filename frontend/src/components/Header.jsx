@@ -22,7 +22,11 @@ const Header = () => {
                 {
                     method: 'POST',
                     credentials: 'include',
-                }
+                    headers: {
+                        'ngrok-skip-browser-warning': 'true'
+                    },
+                },
+
             );
 
             if (!res.ok) {

@@ -22,15 +22,20 @@ const skipMorgan = (req) => {
 
 app.use(morgan('dev', {skip: skipMorgan}));
 
-const allowedOrigins = process.env.CORS_ORIGIN.split(',') || [];
+const allowedOrigins = process.env.CORS_ORIGIN.split(',') || []
+
+
+app.use((req, res, next) => {
+    res.setHeader('ngrok-skip-browser-warning', 'true');
+    next();
+});
 
 app.use(
     cors({
-        origin: allowedOrigins,
+        origin: 'http://localhost:5173',
         credentials: true,
     })
 );
-
 app.use(express.json());
 
 app.use("/uploads", express.static(path.join(process.cwd(), "src/uploads")));
