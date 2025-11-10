@@ -9,6 +9,7 @@ import BloodDonationHospitalPage from './pages/Hospital/BloodDonationHospitalPag
 import BloodDonationUserPage from './pages/User/BloodDonationUserPage.jsx';
 import HospitalDashboard from './pages/Hospital/Dashboard.jsx';
 import BloodReceive from './pages/User/BloodReceive.jsx';
+import AmbulanceCall from './pages/Hospital/AmbulanceCall.jsx';
 
 import {createBrowserRouter, RouterProvider} from 'react-router-dom';
 import PharmacyAuth from './pages/Pharmacy/PharmacyAuth.jsx';
@@ -61,6 +62,10 @@ const router = createBrowserRouter([
             {
                 path: '/user/bloodreceive',
                 element: <BloodReceive />,
+            },
+            {
+                path: '/user/ambulancecall',
+                element: <AmbulanceCall />,
             },
             {
                 path: '*',
