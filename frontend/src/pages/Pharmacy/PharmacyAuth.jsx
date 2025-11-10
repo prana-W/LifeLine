@@ -143,7 +143,8 @@ export default function PharmacyAuth() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-blue-600 via-mint-600 to-mint-600"
+    <div
+      className="min-h-screen relative overflow-hidden bg-gradient-to-br from-blue-600 via-mint-600 to-mint-600"
       style={{
         background: "linear-gradient(135deg, #D8C4FF, #BFA6FF, #A78FFF, #957AFF)",
       }}
@@ -165,8 +166,14 @@ export default function PharmacyAuth() {
       {/* Floating Circles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-16 left-24 w-32 h-32 bg-white rounded-full opacity-10 animate-float"></div>
-        <div className="absolute bottom-20 right-32 w-40 h-40 bg-lavender-300 rounded-full opacity-10 animate-float" style={{ animationDelay: "1s" }}></div>
-        <div className="absolute top-1/2 left-10 w-24 h-24 bg-mint-200 rounded-full opacity-10 animate-float" style={{ animationDelay: "2s" }}></div>
+        <div
+          className="absolute bottom-20 right-32 w-40 h-40 bg-lavender-300 rounded-full opacity-10 animate-float"
+          style={{ animationDelay: "1s" }}
+        ></div>
+        <div
+          className="absolute top-1/2 left-10 w-24 h-24 bg-mint-200 rounded-full opacity-10 animate-float"
+          style={{ animationDelay: "2s" }}
+        ></div>
       </div>
 
       {/* MAIN CONTAINER */}
@@ -204,7 +211,7 @@ export default function PharmacyAuth() {
                   <Pill className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-[#7A67C7]">MediBridge</h1>
+                  <h1 className="text-xl font-bold text-[#7A67C7]">LifeLine</h1>
                   <p className="text-xs text-gray-500">Pharmacy Portal</p>
                 </div>
               </div>
@@ -222,8 +229,7 @@ export default function PharmacyAuth() {
 
               {/* Footer */}
               <div className="absolute bottom-8 left-8 text-xs text-gray-400">
-                <p>© 2024 MediBridge Pharmacy Portal</p>
-                <p>Powered by HealthTech</p>
+                <p>© 2024 LifeLine Pharmacy Portal</p>
               </div>
             </div>
           </div>
@@ -258,7 +264,9 @@ export default function PharmacyAuth() {
                       {isLogin ? "Login" : "Register"}
                     </h2>
                     <p className="text-violet-500 text-sm">
-                      {isLogin ? "Access your pharmacy account" : "Create your pharmacy account"}
+                      {isLogin
+                        ? "Access your pharmacy account"
+                        : "Create your pharmacy account"}
                     </p>
                   </div>
 
@@ -279,11 +287,11 @@ export default function PharmacyAuth() {
                   {isLogin ? (
                     <form className="space-y-4" onSubmit={handleLoginSubmit}>
                       <div>
-                        <Label className="text-violet-500 mb-1.5">Phone Number</Label>
+                        <Label className="text-violet-500 mb-1.5 ">Phone Number</Label>
                         <div className="relative">
-                          <Phone className="absolute left-3 top-3 text-violet-500/70" />
+                          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-violet-500/70" />
                           <Input
-                            className="pl-10 bg-white/20 border-white/30 text-white placeholder:text-white/60"
+                            className="pl-10 bg-white/20 border-white/30 text-black placeholder:text-black/50"
                             value={loginForm.phoneNumber}
                             onChange={(e) =>
                               setLoginForm({ ...loginForm, phoneNumber: e.target.value })
@@ -296,10 +304,10 @@ export default function PharmacyAuth() {
                       <div>
                         <Label className="text-violet-500 mb-1.5">Password</Label>
                         <div className="relative">
-                          <Lock className="absolute left-3 top-3 text-violet-500/70" />
+                          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-violet-500/70" />
                           <Input
                             type="password"
-                            className="pl-10 bg-white/20 border-white/30 text-white placeholder:text-white/60"
+                            className="pl-10 bg-white/20 border-white/30 text-black placeholder:text-black/50"
                             value={loginForm.password}
                             onChange={(e) =>
                               setLoginForm({ ...loginForm, password: e.target.value })
