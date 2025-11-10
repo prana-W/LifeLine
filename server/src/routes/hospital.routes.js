@@ -1,10 +1,10 @@
 import {Router} from 'express';
 import {
     addBloodDonation,
-    giveBloodDonation,
-    getEmergenciesByHospital
+    giveBloodDonation
 } from '../controllers/hospital/hospital.controller.js';
 import {verifyAccessToken} from '../middlewares/index.js';
+import {deleteEmergency} from "../controllers/emergency.controller.js";
 
 const hospitalRouter = Router();
 
@@ -13,7 +13,8 @@ hospitalRouter
     .route('/giveBloodDonation')
     .post(verifyAccessToken, giveBloodDonation);
 hospitalRouter
-    .route('/getEmergency')
-    .get(verifyAccessToken, getEmergenciesByHospital);
+    .route('/deleteEmergency')
+    .delete(verifyAccessToken, deleteEmergency);
+
 
 export default hospitalRouter;

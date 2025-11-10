@@ -4,7 +4,7 @@ import {verifyAccessToken} from '../middlewares/index.js';
 import {
     createEmergencyAlert,
     upload,
-    callAmbulance, requestBloodEmergency
+    callAmbulance, requestBloodEmergency, deleteEmergency
 } from '../controllers/emergency.controller.js';
 
 const user = Router();
@@ -19,7 +19,6 @@ user.post(
 
 user.post('/ambulance', verifyAccessToken, callAmbulance);
 user.post('/raiseBloodRequest', verifyAccessToken, requestBloodEmergency);
-
-// organ donation
+user.delete('/deleteEmergency', verifyAccessToken, deleteEmergency);
 
 export default user;
