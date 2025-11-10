@@ -252,7 +252,7 @@ export default function EmergencyAlert() {
     }, []);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 p-6 flex items-center justify-center">
+        <div className="bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 flex items-center justify-center">
             <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
                 <div className="text-center mb-8">
                     <div className="inline-flex items-center justify-center w-20 h-20 bg-red-100 rounded-full mb-4 animate-pulse">

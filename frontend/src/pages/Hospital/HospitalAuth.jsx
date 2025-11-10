@@ -162,8 +162,8 @@ export default function HospitalAuth() {
       } else {
         setMessage({ type: 'error', text: data.message || 'Login failed!' });
       }
-    } catch {
-      setMessage({ type: 'error', text: 'Network error. Please try again.' });
+    } catch (err) {
+      setMessage({ type: 'error', text: err?.message || 'Login failed!' });
     } finally {
       setLoading(false);
     }
@@ -197,8 +197,8 @@ export default function HospitalAuth() {
       } else {
         setMessage({ type: 'error', text: data.message || 'Registration failed!' });
       }
-    } catch {
-      setMessage({ type: 'error', text: 'Network error. Please try again.' });
+    } catch (err) {
+      setMessage({ type: 'error', text: err?.message });
     } finally {
       setLoading(false);
     }
@@ -272,7 +272,7 @@ export default function HospitalAuth() {
                     <Activity className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h1 className="text-xl font-bold text-teal-700">MediBridge</h1>
+                    <h1 className="text-xl font-bold text-teal-700">LifeLine</h1>
                     <p className="text-xs text-gray-500">Hospital Portal</p>
                   </div>
                 </div>
@@ -291,7 +291,7 @@ export default function HospitalAuth() {
 
               {/* Footer text */}
               <div className="absolute bottom-8 left-8 text-xs text-gray-400">
-                <p>© 2024 MediBridge Hospital Portal</p>
+                <p>© 2025 LifeLine Hospital Portal</p>
                 <p>Powered by HealthTech</p>
               </div>
             </div>
@@ -406,7 +406,7 @@ export default function HospitalAuth() {
                             </svg>
                             Logging in...
                           </span>
-                        ) : 'Login to WiFi'}
+                        ) : 'Login to Hospital'}
                       </Button>
                     </div>
                   ) : (
@@ -539,8 +539,8 @@ export default function HospitalAuth() {
                     </p>
                     <p className="text-teal-300 text-xs mt-2">
                       Have a problem? Contact us at{' '}
-                      <a href="mailto:support@medibridge.com" className="underline hover:text-white">
-                        support@medibridge.com
+                      <a href="mailto:support@lifeline.com" className="underline hover:text-white">
+                        support@lifeline.com
                       </a>
                     </p>
                   </div>

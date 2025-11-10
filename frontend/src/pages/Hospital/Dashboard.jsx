@@ -65,7 +65,7 @@ export default function Dashboard() {
 
     const intervalId = setInterval(() => {
       fetchEmergencies({ showSpinner: false });
-    }, 10000); // 10 seconds
+    }, 5000); // 5 seconds
 
     return () => clearInterval(intervalId);
   }, [fetchEmergencies]);
@@ -170,7 +170,7 @@ export default function Dashboard() {
 
       {/* FOOTER */}
       <footer className="text-center text-teal-200 text-sm mt-20">
-        © 2025 MediBridge Hospital Network
+        © 2025 LifeLine Hospital Network
       </footer>
     </div>
   );
