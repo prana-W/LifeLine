@@ -85,6 +85,24 @@ const Header = () => {
     const renderNavigation = () => {
         if (!role || role === 'null') {
             return (
+                <>
+
+                    <button
+                        onClick={() => navigateTo('/analytics')}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg ${theme.hover} ${theme.text} transition-all duration-200 font-medium`}
+                    >
+                        <LayoutDashboard size={18} />
+                        Analytics
+                    </button>
+
+                    <button
+                        onClick={() => navigateTo('/about')}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg ${theme.hover} ${theme.text} transition-all duration-200 font-medium`}
+                    >
+                        <LayoutDashboard size={18} />
+                        About Us
+                    </button>
+
                 <button
                     onClick={() => navigateTo('/')}
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg ${theme.hover} ${theme.text} transition-all duration-200 font-medium`}
@@ -92,6 +110,8 @@ const Header = () => {
                     <User size={18} />
                     Login
                 </button>
+                        </>
+
             );
         }
 
@@ -107,12 +127,20 @@ const Header = () => {
                             Dashboard
                         </button>
                         <button
+                            onClick={() => navigateTo('/analytics')}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg ${theme.hover} ${theme.text} transition-all duration-200 font-medium`}
+                        >
+                            <LayoutDashboard size={18} />
+                            Analytics
+                        </button>
+                        <button
                             onClick={handleLogout}
                             className={`flex items-center gap-2 px-4 py-2 rounded-lg ${theme.button} text-white transition-all duration-200 font-medium ml-2`}
                         >
                             <LogOut size={18} />
                             Logout
                         </button>
+
                     </>
                 );
             case 'user':
@@ -131,6 +159,20 @@ const Header = () => {
                         >
                             <Droplet size={18} />
                             Blood Donation
+                        </button>
+                        <button
+                            onClick={() => navigateTo('/analytics')}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg ${theme.hover} ${theme.text} transition-all duration-200 font-medium`}
+                        >
+                            <LayoutDashboard size={18} />
+                            Analytics
+                        </button>
+                        <button
+                            onClick={() => navigateTo('/about')}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg ${theme.hover} ${theme.text} transition-all duration-200 font-medium`}
+                        >
+                            <LayoutDashboard size={18} />
+                            About Us
                         </button>
                         <button
                             onClick={handleLogout}
@@ -157,6 +199,13 @@ const Header = () => {
                         >
                             <Droplet size={18} />
                             Blood
+                        </button>
+                        <button
+                            onClick={() => navigateTo('/analytics')}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg ${theme.hover} ${theme.text} transition-all duration-200 font-medium`}
+                        >
+                            <LayoutDashboard size={18} />
+                            Analytics
                         </button>
                         <button
                             onClick={handleLogout}
