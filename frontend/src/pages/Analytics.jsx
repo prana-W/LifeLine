@@ -110,6 +110,12 @@ const Analytics = () => {
                     <p className="text-gray-600 mt-2">Real-time insights and metrics • Auto-refreshes every 10 seconds</p>
                 </div>
 
+                <div className="flex flex-col items-center justify-center p-6 bg-gradient-to-r from-red-500 to-orange-500 rounded-2xl text-white shadow-lg">
+                    <Heart className="h-8 w-8 mb-2" />
+                    <h2 className="text-2xl font-bold">{data.overview['Total Lives Impacted'].toLocaleString()}</h2>
+                    <p className="text-sm opacity-80">Total Lives Impacted</p>
+                </div>
+
                 {/* Overview Stats */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <StatCard
@@ -136,6 +142,7 @@ const Analytics = () => {
                         icon={TrendingUp}
                         color="orange"
                     />
+
                 </div>
 
                 {/* Blood Bank Section */}

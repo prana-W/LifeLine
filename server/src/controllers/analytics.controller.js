@@ -281,6 +281,11 @@ const getAllAnalytics = asyncHandler(async (req, res) => {
         ? aggregatedData.engagement.totalRatingSum / aggregatedData.engagement.reviewCount
         : 0;
 
+    const totalLivesImpacted =
+        aggregatedData.bloodBank.totalDonations +
+        aggregatedData.emergencyServices.totalAmbulanceCalls +
+        aggregatedData.emergencyServices.totalResolved;
+
     // Prepare response data with headings and numbers
     const responseData = {
         overview: {
@@ -288,6 +293,7 @@ const getAllAnalytics = asyncHandler(async (req, res) => {
             'Total Hospitals': totalHospitals,
             'Total Pharmacies': totalPharmacies,
             'Total Pincodes Tracked': allAnalytics.length,
+            'Total Lives Impacted': totalLivesImpacted
         },
         bloodBank: {
             'Total Blood Donations': aggregatedData.bloodBank.totalDonations,
