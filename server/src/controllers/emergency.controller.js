@@ -189,48 +189,22 @@ const callAmbulance = asyncHandler(async (req, res) => {
  * POST /api/v1/user/blood-request
  */
 const requestBloodEmergency = asyncHandler(async (req, res) => {
-
     const userId = req.userId;
+    const { pincode, latitude, longitude, location, city, state } = req.body;
+
+    if (!pincode || !latitude || !longitude) {
+        throw new ApiError(statusCode.BAD_REQUEST, "Missing required location details");
+    }
 
     const user = await User.findById(userId);
-
     if (!user) {
         throw new ApiError(statusCode.BAD_REQUEST, "User not found!");
     }
 
-    const {
-        pinCode: bodyPincode,
-        latitude,
-        longitude,
-        location,
-        city,
-        state,
-    } = req.body;
+    const { bloodType, name: patientName, phoneNumber } = user;
 
-    const {
-        bloodType,
-        name: patientName,
-        pinCode: userPincode,
-        phoneNumber,
-    } = user;
-
-    // Choose the most accurate pincode (frontend > user)
-    const pinCode = bodyPincode || userPincode;
-
-    console.log("📍 Received blood request:", {
-        bloodType,
-        patientName,
-        pinCode,
-        city,
-        state,
-        location,
-    });
-
-    if (!bloodType || !pinCode) {
-        throw new ApiError(
-            statusCode.BAD_REQUEST,
-            "Blood type and pincode are required."
-        );
+    if (!bloodType) {
+        throw new ApiError(statusCode.BAD_REQUEST, "Blood type is required.");
     }
 
     if (!phoneNumber) {
@@ -249,20 +223,16 @@ const requestBloodEmergency = asyncHandler(async (req, res) => {
         );
     }
 
-    const hospitals = await Hospital.find({ pinCode });
-
-    if (!hospitals.length) {
-        console.warn("⚠️ No hospitals found for pincode:", pinCode);
-    }
+    const hospitals = await Hospital.find({ pinCode: pincode });
 
     const bloodRequest = await Emergency.create({
         user: userId,
         type: "blood",
         hospitalsNotified: hospitals.map((h) => h._id),
-        pinCode,
+        pinCode: pincode,
         location: {
-            latitude,
-            longitude,
+            latitude: parseFloat(latitude),
+            longitude: parseFloat(longitude),
             address: location || "Location not provided",
             city: city || "Unknown",
             state: state || "Unknown",
@@ -276,17 +246,44 @@ const requestBloodEmergency = asyncHandler(async (req, res) => {
         status: "pending",
     });
 
-    console.log("✅ Blood emergency created:", bloodRequest._id);
 
-    return res
-        .status(statusCode.CREATED)
-        .json(
-            new ApiResponse(
-                statusCode.CREATED,
-                "Blood emergency request raised successfully and nearby hospitals notified!"
-            )
-        );
+    // 📨 Prepare a consistent response
+    let responseMessage = "";
+    let responseData = {
+        emergencyId: bloodRequest._id,
+        type: "blood",
+        hospitalsCount: hospitals.length,
+        bloodDetails: {
+            bloodType,
+            patientName,
+            phoneNumber,
+        },
+        location: {
+            pinCode: pincode,
+            coordinates: {
+                latitude: parseFloat(latitude),
+                longitude: parseFloat(longitude),
+            },
+            address: location,
+            city,
+            state,
+        },
+    };
+
+    if (!hospitals.length) {
+        responseMessage = `Blood request registered. Warning: No hospitals found in pincode ${pincode}. Emergency services will be notified manually.`;
+        responseData.warning = `No hospitals found in pincode: ${pincode}`;
+        responseData.hospitalsNotified = false;
+    } else {
+        responseMessage = "Blood emergency request raised successfully and nearby hospitals notified.";
+        responseData.hospitalsNotified = true;
+    }
+
+    return res.status(statusCode.CREATED).json(
+        new ApiResponse(statusCode.CREATED, responseMessage, responseData)
+    );
 });
+
 
 
 /**

@@ -7,10 +7,10 @@ import { toast } from "sonner";
 
 export default function BloodReceive() {
     const api = useApi();
-    const [loading, setLoading] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
     const [alert, setAlert] = useState({ type: "", text: "" });
 
-    // 🧭 Get user’s location + address details
+    // 📍 Fetch user geolocation + address details
     const getLocationData = async () => {
         return new Promise((resolve, reject) => {
             if (!navigator.geolocation) {
@@ -21,19 +21,12 @@ export default function BloodReceive() {
             navigator.geolocation.getCurrentPosition(
                 async (position) => {
                     const { latitude, longitude } = position.coords;
-
                     try {
                         const response = await fetch(
                             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`,
-                            {
-                                headers: {
-                                    "User-Agent": "BloodEmergency/1.0",
-                                },
-                            }
+                            { headers: { "User-Agent": "BloodEmergency/1.0" } }
                         );
-
                         const data = await response.json();
-
                         resolve({
                             latitude,
                             longitude,
@@ -55,52 +48,58 @@ export default function BloodReceive() {
         });
     };
 
-    // 🩸 Trigger emergency
+    // 🩸 Trigger a new blood emergency
     const triggerEmergency = async () => {
-        setLoading(true);
+        setIsProcessing(true);
         setAlert({ type: "", text: "" });
 
         try {
             toast.info("Getting your location...");
             const locationData = await getLocationData();
 
-            const { success, message } = await api.post("/user/raiseBloodRequest", {
-                pinCode: locationData.pincode,
-                latitude: locationData.latitude,
-                longitude: locationData.longitude,
-                location: locationData.fullAddress,
-                city: locationData.city,
-                state: locationData.state,
-            });
+            const { success, message, data } = await api.post(
+                "/user/raiseBloodRequest",
+                {
+                    pincode: locationData.pincode,
+                    latitude: locationData.latitude,
+                    longitude: locationData.longitude,
+                    location: locationData.fullAddress,
+                    city: locationData.city,
+                    state: locationData.state,
+                }
+            );
 
             if (success) {
-                toast.success(message || "Emergency blood request raised successfully!");
+                toast.success(
+                    message || "Emergency blood request raised successfully!"
+                );
+                console.log(data)
                 setAlert({
                     type: "success",
                     text: "Emergency blood request raised successfully!",
                 });
             } else {
-                toast.error(message || "Could not send request.");
+                toast.error(message || "Failed to raise blood request");
                 setAlert({
                     type: "error",
-                    text: message || "Could not send request.",
+                    text: message || "Failed to raise blood request",
                 });
             }
         } catch (error) {
-            console.error("Blood request error:", error);
+            console.error("❌ Blood request error:", error);
             toast.error(error.message || "Failed to raise blood emergency");
             setAlert({
                 type: "error",
                 text: error.message || "Failed to raise blood emergency",
             });
         } finally {
-            setLoading(false);
+            setIsProcessing(false);
         }
     };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 to-red-100 px-6 py-10 relative">
-            {/* Soft floating background icon */}
+            {/* Decorative Background Droplet */}
             <Droplet
                 className="absolute top-10 left-10 w-64 h-64 opacity-[0.06]"
                 color="#ef4444"
@@ -109,17 +108,13 @@ export default function BloodReceive() {
 
             <Card
                 className="w-full max-w-lg p-8 shadow-2xl border-none backdrop-blur-xl"
-                style={{
-                    background: "rgba(255,255,255,0.8)",
-                    borderRadius: "22px",
-                }}
+                style={{ background: "rgba(255,255,255,0.8)", borderRadius: "22px" }}
             >
                 <CardHeader className="text-center">
                     <CardTitle className="text-3xl font-bold text-red-600 flex items-center justify-center gap-3">
                         <Siren className="w-7 h-7 text-red-500 animate-pulse" />
                         Blood Emergency
                     </CardTitle>
-
                     <p className="text-gray-600 mt-1">
                         Instantly alert hospitals that you need blood.
                     </p>
@@ -143,19 +138,25 @@ export default function BloodReceive() {
                     {/* Emergency Button */}
                     <Button
                         onClick={triggerEmergency}
-                        disabled={loading}
-                        className="w-full py-6 text-lg rounded-xl text-white shadow-md hover:shadow-xl transition-all hover:scale-[1.03]"
+                        disabled={isProcessing}
+                        className="
+              w-full py-6 text-lg rounded-xl text-white shadow-md
+              hover:shadow-xl transition-all hover:scale-[1.03]
+            "
                         style={{
                             background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
                         }}
                     >
-                        {loading ? (
+                        {isProcessing ? (
                             <>
                                 <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                                Sending Emergency Signal...
+                                Sending Blood Request...
                             </>
                         ) : (
-                            "Raise Blood Emergency"
+                            <>
+                                <Siren className="w-5 h-5 mr-2" />
+                                Raise Blood Emergency
+                            </>
                         )}
                     </Button>
 
