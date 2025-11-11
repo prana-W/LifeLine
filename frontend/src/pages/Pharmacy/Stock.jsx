@@ -1,56 +1,63 @@
 import React, { useEffect, useState, useRef } from "react";
-import useApi from "@/hooks/useApi";
+import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Trash2, Minus, Plus, Search } from "lucide-react";
-import { Activity, Heart } from "lucide-react";
+import {
+  Trash2,
+  Minus,
+  Plus,
+  Search,
+  Package,
+  AlertTriangle,
+  Clock,
+  DollarSign,
+  X
+} from "lucide-react";
 
 export default function Stock() {
-  const api = useApi();
-
   const [search, setSearch] = useState("");
   const [filtered, setFiltered] = useState([]);
   const [allMedicines, setAllMedicines] = useState([]);
   const [loaded, setLoaded] = useState(false);
-
   const [showDropdown, setShowDropdown] = useState(false);
   const [selected, setSelected] = useState(null);
-
+  const [slideDirection, setSlideDirection] = useState(0);
   const wrapperRef = useRef(null);
 
-  // ADD MEDICINE MODAL
+  // Add Medicine Modal
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [newMed, setNewMed] = useState({ name: "", quantity: "", price: "" });
 
-  // ===================== Fetch Medicines =====================
+  // Mock data
   useEffect(() => {
-    async function fetchMedicines() {
-      const { success, data } = await api.get("/pharmacy/getAllMedicines");
-      if (success && data?.medicines) {
-        setAllMedicines(data.medicines);
-        setLoaded(true);
-      }
-    }
-    fetchMedicines();
+    const mockMedicines = [
+      { _id: "1", name: "Paracetamol", quantity: 150, price: 5 },
+      { _id: "2", name: "Ibuprofen", quantity: 80, price: 8 },
+      { _id: "3", name: "Amoxicillin", quantity: 0, price: 12 },
+      { _id: "4", name: "Aspirin", quantity: 200, price: 3 },
+      { _id: "5", name: "Omeprazole", quantity: 45, price: 15 },
+      { _id: "6", name: "Metformin", quantity: 120, price: 10 },
+      { _id: "7", name: "Atorvastatin", quantity: 0, price: 18 },
+      { _id: "8", name: "Lisinopril", quantity: 95, price: 14 },
+    ];
+    setAllMedicines(mockMedicines);
+    setFiltered(mockMedicines);
+    setLoaded(true);
   }, []);
 
-  // ===================== Search Logic =====================
+  // Filter search
   useEffect(() => {
     if (!loaded) return;
-
     const s = search.trim().toLowerCase();
-
-    if (!s) {
-      setFiltered(allMedicines);
-      return;
-    }
-
-    const f = allMedicines.filter((m) => m.name.toLowerCase().startsWith(s));
+    if (!s) return setFiltered(allMedicines);
+    const f = allMedicines.filter((m) =>
+      m.name.toLowerCase().startsWith(s)
+    );
     setFiltered(f);
   }, [search, allMedicines, loaded]);
 
-  // ===================== Dropdown Close =====================
+  // Close dropdown on click outside
   useEffect(() => {
     function handleClickOutside(e) {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
@@ -61,21 +68,23 @@ export default function Stock() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // ===================== Select Medicine =====================
   const handleSelect = (med) => {
+    const currentIndex = allMedicines.findIndex((m) => m._id === selected?._id);
+    const newIndex = allMedicines.findIndex((m) => m._id === med._id);
+    setSlideDirection(newIndex > currentIndex ? 1 : -1);
     setSelected(med);
     setSearch(med.name);
     setShowDropdown(false);
   };
 
-  // ===================== Local Update =====================
   const updateLocal = (id, delta) => {
     setAllMedicines((prev) =>
       prev.map((m) =>
-        m._id === id ? { ...m, quantity: Math.max(0, m.quantity + delta) } : m
+        m._id === id
+          ? { ...m, quantity: Math.max(0, m.quantity + delta) }
+          : m
       )
     );
-
     setSelected((prev) =>
       prev && prev._id === id
         ? { ...prev, quantity: Math.max(0, prev.quantity + delta) }
@@ -83,290 +92,330 @@ export default function Stock() {
     );
   };
 
-  const removeLocal = (id) => {
-    setAllMedicines((prev) => prev.filter((m) => m._id !== id));
-    setFiltered((prev) => prev.filter((m) => m._id !== id));
+  const handleIncrement = () => updateLocal(selected._id, 10);
+  const handleDecrement = () =>
+    selected.quantity > 0 && updateLocal(selected._id, -10);
 
-    if (selected?._id === id) setSelected(null);
+  const handleDelete = () => {
+    setAllMedicines((prev) => prev.filter((m) => m._id !== selected._id));
+    setFiltered((prev) => prev.filter((m) => m._id !== selected._id));
+    setSelected(null);
   };
 
-  // ===================== Quantity Buttons =====================
-  const handleIncrement = async () => {
-    const id = selected._id;
-    updateLocal(id, 10);
-
-    const res = await api.put(`/pharmacy/updateMedicine/${id}`, { delta: 10 });
-    if (!res.success) updateLocal(id, -10);
-  };
-
-  const handleDecrement = async () => {
-    const id = selected._id;
-    if (selected.quantity <= 0) return;
-
-    updateLocal(id, -10);
-
-    const res = await api.put(`/pharmacy/updateMedicine/${id}`, { delta: -10 });
-    if (!res.success) updateLocal(id, 10);
-  };
-
-  const handleDelete = async () => {
-    const id = selected._id;
-    const backup = selected;
-    removeLocal(id);
-
-    const res = await api.delete(`/pharmacy/deleteMedicine/${id}`);
-    if (!res.success) {
-      setAllMedicines((prev) => [...prev, backup]);
-      setSelected(backup);
-    }
-  };
-
-  // ===================== Add Medicine =====================
-  const handleAddNewMedicine = async () => {
-    const payload = {
+  // Add new medicine handler
+  const handleAddNewMedicine = () => {
+    if (!newMed.name.trim()) return;
+    const newItem = {
+      _id: Date.now().toString(),
       name: newMed.name,
       quantity: Number(newMed.quantity),
       price: Number(newMed.price),
     };
-
-    const res = await api.post("/pharmacy/addNewMedicine", payload);
-
-    if (res.success && res.data?.medicine) {
-      setAllMedicines((prev) => [...prev, res.data.medicine]);
-      setFiltered((prev) => [...prev, res.data.medicine]);
-
-      setNewMed({ name: "", quantity: "", price: "" });
-      setAddModalOpen(false);
-    }
+    setAllMedicines((prev) => [...prev, newItem]);
+    setFiltered((prev) => [...prev, newItem]);
+    setNewMed({ name: "", quantity: "", price: "" });
+    setAddModalOpen(false);
   };
 
+  const getSideCards = () => {
+    if (!selected) return { left: null, right: null };
+    const idx = allMedicines.findIndex((m) => m._id === selected._id);
+    return {
+      left: allMedicines[(idx - 1 + allMedicines.length) % allMedicines.length],
+      right: allMedicines[(idx + 1) % allMedicines.length],
+    };
+  };
+
+  const lowStockItems = allMedicines.filter(
+    (m) => m.quantity > 0 && m.quantity < 50
+  );
+  const totalValue = allMedicines.reduce(
+    (acc, m) => acc + m.quantity * m.price,
+    0
+  );
+
   return (
-    <div className="w-full min-h-screen">
+    <div
+      className="
+        w-full min-h-screen 
+        bg-[radial-gradient(circle,_#b38bfa_1px,_transparent_1px)]
+        bg-[length:18px_18px]
+        bg-purple-50/30
+      "
+    >
+      <section className="relative w-full min-h-screen flex flex-col items-center pt-24 pb-16">
 
-      {/* ======================================================
-           HERO SECTION
-      ======================================================= */}
-      <section className="relative w-full h-[750px] flex flex-col justify-center items-center text-center overflow-hidden">
-
-        {/* Background image - Full display */}
-        <img
-          src="/hospitalforstocksbg.png"
-          alt="Background"
-          className="absolute inset-0 w-full h-full object-cover object-center blur-xs"
-        />
-
-        {/* Overlay for better text readability (optional) */}
-        <div className="absolute inset-0 bg-white/10" />
-
-        {/* TEXT */}
-        <h1 className="relative z-10 text-4xl sm:text-5xl font-bold text-[#1f1f3a] mb-8">
-          Manage Your <span className="text-purple-600">Stock</span>
-        </h1>
-
-        <p className="relative z-10 text-gray-600 text-sm sm:text-base max-w-xl mb-8 px-4">
-          Search, update, and manage all your pharmacy medicines with ease.
-        </p>
-
-        {/* Search Bar */}
-        <div 
-          ref={wrapperRef}
-          className="relative z-20 w-[90%] max-w-3xl bg-white 
-                     shadow-2xl rounded-full flex items-center px-6 py-4 gap-4 mb-100"
+        {/* HEADER */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-10"
         >
-          <Search className="text-gray-400 w-5 h-5 " />
+          <div className="inline-flex items-center gap-2 bg-purple-100 px-6 py-2 rounded-full mb-4 shadow-md">
+            <Package className="h-5 w-5 text-purple-700" />
+            <span className="text-purple-700 font-semibold">
+              Inventory Dashboard
+            </span>
+          </div>
 
-          <Input
-            placeholder="Search medicine..."
-            className="border-none shadow-none focus:ring-0 text-gray-700 placeholder:text-gray-400 flex-1"
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setShowDropdown(true);
-            }}
-            onFocus={() => {
-              setShowDropdown(true);
-              if (!search.trim()) setFiltered(allMedicines);
-            }}
-          />
+          <h1 className="text-6xl font-bold text-[#1f1f3a]">
+            Manage Your{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">
+              Stock
+            </span>
+          </h1>
+        </motion.div>
 
-          <Button className="rounded-full bg-purple-600 hover:bg-purple-700 px-8">
-            Search
-          </Button>
+        {/* SEARCH BAR */}
+        <div className="w-full px-4">
+          <div
+            ref={wrapperRef}
+            className="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl px-6 py-5 flex items-center gap-4 border border-purple-100 relative"
+          >
+            <Search className="text-purple-500 w-6 h-6" />
 
-          {/* Dropdown */}
-          {showDropdown && filtered.length > 0 && (
-            <Card className="absolute top-16 left-0 w-full shadow-lg border bg-white z-40 rounded-2xl">
-              <ul className="divide-y max-h-64 overflow-y-auto rounded-2xl">
-                {filtered.map((item) => (
-                  <li
-                    key={item._id}
-                    className="px-4 py-3 hover:bg-purple-100 cursor-pointer flex justify-between"
-                    onClick={() => handleSelect(item)}
-                  >
-                    <span>{item.name}</span>
-                    <span className="text-sm text-gray-500">Qty: {item.quantity}</span>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-          )}
+            <Input
+              placeholder="Search medicine..."
+              className="border-none flex-1 text-lg focus-visible:ring-0"
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setShowDropdown(true);
+              }}
+              onFocus={() => {
+                setShowDropdown(true);
+                if (!search.trim()) setFiltered(allMedicines);
+              }}
+            />
 
-          {/* No Result */}
-          {showDropdown && filtered.length === 0 && search.trim() && (
-            <Card className="absolute top-16 left-0 w-full p-4 border bg-white shadow z-40 rounded-2xl">
-              <p className="text-gray-500 mb-3">No medicines found</p>
+            {/* SEARCH BUTTON */}
+            <Button className="rounded-full bg-gradient-to-r from-purple-600 to-blue-600 px-6 text-white">
+              Search
+            </Button>
 
-              <Button
-                className="bg-purple-600 text-white hover:bg-purple-700"
-                onClick={() => setAddModalOpen(true)}
-              >
-                Add New Medicine
-              </Button>
-            </Card>
-          )}
+            {/* ADD NEW MEDICINE BUTTON */}
+            <Button
+              onClick={() => setAddModalOpen(true)}
+              className="rounded-full bg-purple-500 hover:bg-purple-600 text-white px-6 shadow-md"
+            >
+              + Add
+            </Button>
+
+            {/* DROPDOWN */}
+            <AnimatePresence>
+              {showDropdown && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="absolute top-20 left-0 w-full z-40"
+                >
+                  <Card className="bg-white rounded-xl shadow-xl border border-purple-100">
+                    <ul className="max-h-72 overflow-y-auto">
+                      {filtered.map((item) => (
+                        <li
+                          key={item._id}
+                          className="px-6 py-4 hover:bg-purple-50 cursor-pointer flex justify-between"
+                          onClick={() => handleSelect(item)}
+                        >
+                          <span>{item.name}</span>
+                          <span
+                            className={
+                              item.quantity === 0
+                                ? "text-red-600"
+                                : item.quantity < 50
+                                ? "text-orange-600"
+                                : "text-green-600"
+                            }
+                          >
+                            Qty: {item.quantity}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </Card>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
+
+        {/* SELECTED MEDICINE + SIDE CARDS */}
+        <AnimatePresence mode="wait">
+          {selected && (
+            <motion.div
+              key="selectedMed"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="mt-12 w-full flex justify-center"
+            >
+              <div className="flex gap-8 items-end">
+                {(() => {
+                  const { left, right } = getSideCards();
+
+                  return (
+                    <>
+                      {/* LEFT CARD */}
+                      {left && (
+                        <Card
+                          onClick={() => handleSelect(left)}
+                          className="w-64 p-5 bg-white/90 border rounded-2xl shadow-xl cursor-pointer hover:scale-105 transition-all"
+                        >
+                          <p className="font-semibold text-purple-700">
+                            {left.name}
+                          </p>
+                          <p className="text-gray-600 text-sm">
+                            Qty: {left.quantity}
+                          </p>
+                        </Card>
+                      )}
+
+                      {/* CENTER CARD */}
+                      <motion.div
+                        key={selected._id}
+                        initial={{ y: slideDirection * 100, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: slideDirection * -100, opacity: 0 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 150,
+                          damping: 20,
+                        }}
+                      >
+                        <Card className="w-[450px] p-8 bg-gradient-to-br from-white to-purple-50 rounded-3xl shadow-2xl border-2 border-purple-200">
+                          <h2 className="text-3xl font-bold text-purple-700">
+                            {selected.name}
+                          </h2>
+
+                          <div className="grid grid-cols-3 gap-3 mt-6">
+                            <div className="bg-white p-4 rounded-xl shadow">
+                              <p className="text-xl font-bold text-purple-700">
+                                {selected.quantity}
+                              </p>
+                              <p className="text-gray-500 text-xs">Qty</p>
+                            </div>
+
+                            <div className="bg-white p-4 rounded-xl shadow">
+                              <p className="text-xl font-bold text-blue-700">
+                                ₹{selected.price}
+                              </p>
+                              <p className="text-gray-500 text-xs">Price</p>
+                            </div>
+
+                            <div className="bg-white p-4 rounded-xl shadow">
+                              <p className="text-xl font-bold text-green-700">
+                                ₹{selected.quantity * selected.price}
+                              </p>
+                              <p className="text-gray-500 text-xs">Value</p>
+                            </div>
+                          </div>
+
+                          <div className="flex justify-center gap-4 mt-6">
+                            <Button
+                              variant="outline"
+                              onClick={handleDecrement}
+                            >
+                              <Minus className="w-4 h-4 mr-1" /> Remove 10
+                            </Button>
+
+                            <Button
+                              className="bg-purple-600 text-white"
+                              onClick={handleIncrement}
+                            >
+                              <Plus className="w-4 h-4 mr-1" /> Add 10
+                            </Button>
+
+                            <Button
+                              variant="destructive"
+                              onClick={handleDelete}
+                            >
+                              <Trash2 />
+                            </Button>
+                          </div>
+                        </Card>
+                      </motion.div>
+
+                      {/* RIGHT CARD */}
+                      {right && (
+                        <Card
+                          onClick={() => handleSelect(right)}
+                          className="w-64 p-5 bg-white/90 rounded-2xl shadow-xl cursor-pointer hover:scale-105 transition-all"
+                        >
+                          <p className="font-semibold text-purple-700">
+                            {right.name}
+                          </p>
+                          <p className="text-gray-600 text-sm">
+                            Qty: {right.quantity}
+                          </p>
+                        </Card>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </section>
 
-      {/* ======================================================
-           SELECTED MEDICINE CARD
-      ======================================================= */}
-      {selected && (
-  <div className="flex justify-center w-full px-4 mt-10">
-
-    <Card
-      className="w-full max-w-2xl shadow-2xl border-none p-6 relative overflow-hidden
-                 transition-all hover:shadow-[0_10px_40px_rgba(80,0,150,0.25)]
-                 rounded-2xl backdrop-blur-xl"
-      style={{
-        background: "rgba(255, 255, 255, 0.7)",
-      }}
-    >
-      {/* Decorative Background Icons */}
-      <Heart
-        className="absolute -top-6 -right-6 w-24 h-24 opacity-[0.06]"
-        color="#9b6bff"
-        fill="#9b6bff"
-      />
-
-      <Activity
-        className="absolute bottom-0 left-0 w-28 h-28 opacity-[0.05]"
-        color="#7c3aed"
-      />
-
-      {/* Header */}
-      <div className="mb-6 text-center">
-        <h2 className="text-2xl font-bold text-purple-700 flex items-center justify-center gap-3">
-          <Search className="w-7 h-7 text-purple-500" />
-          Selected Medicine
-        </h2>
-        <p className="text-gray-600">{selected.name}</p>
-      </div>
-
-      {/* Medicine Details */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
-
-        <div className="p-4 rounded-xl bg-gradient-to-br from-purple-50 to-white hover:scale-105 transition cursor-default">
-          <span className="text-sm text-gray-600 font-medium">Quantity</span>
-          <div className="text-3xl font-bold text-purple-700 mt-1">
-            {selected.quantity}
-          </div>
-        </div>
-
-        <div className="p-4 rounded-xl bg-gradient-to-br from-purple-50 to-white hover:scale-105 transition cursor-default">
-          <span className="text-sm text-gray-600 font-medium">Price</span>
-          <div className="text-3xl font-bold text-purple-700 mt-1">
-            ₹{selected.price}
-          </div>
-        </div>
-
-        <div className="p-4 rounded-xl bg-gradient-to-br from-purple-50 to-white hover:scale-105 transition cursor-default">
-          <span className="text-sm text-gray-600 font-medium">Total Value</span>
-          <div className="text-3xl font-bold text-purple-700 mt-1">
-            ₹{selected.quantity * selected.price}
-          </div>
-        </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex items-center justify-center gap-4 mt-8">
-
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={handleDecrement}
-          className="border-purple-500 text-purple-600 hover:bg-purple-50 hover:text-purple-700 transition-all"
-        >
-          <Minus className="h-5 w-5" />
-        </Button>
-
-        <Button
-          className="bg-purple-600 hover:bg-purple-700 text-white rounded-full px-12 py-5 shadow-lg hover:scale-105 transition-all"
-          onClick={handleIncrement}
-        >
-          Add 10
-        </Button>
-
-        <Button
-          variant="destructive"
-          size="icon"
-          onClick={handleDelete}
-          className="hover:scale-105 transition-all"
-        >
-          <Trash2 className="h-5 w-5" />
-        </Button>
-
-      </div>
-    </Card>
-  </div>
-)}
-
-
-      {/* ======================================================
-           ADD NEW MEDICINE MODAL
-      ======================================================= */}
+      {/* ADD MEDICINE MODAL */}
       {addModalOpen && (
-        <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
-          <Card className="p-6 w-[350px] bg-white shadow-2xl border rounded-xl">
-            <h2 className="text-xl font-bold mb-4">Add New Medicine</h2>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <Card className="p-8 bg-white rounded-2xl max-w-md w-full relative shadow-xl border border-purple-200">
+            <Button
+              variant="ghost"
+              className="absolute top-4 right-4"
+              onClick={() => setAddModalOpen(false)}
+            >
+              <X />
+            </Button>
 
-            <div className="space-y-4 mb-4">
-              <Input
-                placeholder="Medicine Name"
-                value={newMed.name}
-                onChange={(e) =>
-                  setNewMed({ ...newMed, name: e.target.value })
-                }
-              />
+            <h2 className="text-2xl font-bold text-purple-700 mb-6">
+              Add New Medicine
+            </h2>
 
-              <Input
-                placeholder="Quantity"
-                type="number"
-                value={newMed.quantity}
-                onChange={(e) =>
-                  setNewMed({ ...newMed, quantity: e.target.value })
-                }
-              />
+            <Input
+              placeholder="Medicine Name"
+              className="mb-3"
+              value={newMed.name}
+              onChange={(e) =>
+                setNewMed({ ...newMed, name: e.target.value })
+              }
+            />
 
-              <Input
-                placeholder="Price"
-                type="number"
-                value={newMed.price}
-                onChange={(e) =>
-                  setNewMed({ ...newMed, price: e.target.value })
-                }
-              />
-            </div>
+            <Input
+              placeholder="Quantity"
+              type="number"
+              className="mb-3"
+              value={newMed.quantity}
+              onChange={(e) =>
+                setNewMed({ ...newMed, quantity: e.target.value })
+              }
+            />
+
+            <Input
+              placeholder="Price"
+              type="number"
+              className="mb-5"
+              value={newMed.price}
+              onChange={(e) =>
+                setNewMed({ ...newMed, price: e.target.value })
+              }
+            />
 
             <div className="flex justify-end gap-3">
-              <Button variant="outline" onClick={() => setAddModalOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setAddModalOpen(false)}
+              >
                 Cancel
               </Button>
 
               <Button
-                className="bg-purple-600 text-white hover:bg-purple-700"
+                className="bg-purple-600 text-white"
                 onClick={handleAddNewMedicine}
               >
-                Save
+                Add
               </Button>
             </div>
           </Card>
