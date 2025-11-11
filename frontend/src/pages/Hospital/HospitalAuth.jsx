@@ -205,7 +205,10 @@ export default function HospitalAuth() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-teal-600 via-teal-700 to-teal-800">
+    
+
+    
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-teal-600 via-teal-700 to-teal-800 pt-[100px]">
       
       <style>{`
         @keyframes float {
@@ -551,5 +554,6 @@ export default function HospitalAuth() {
         </div>
       </div>
     </div>
+    
   );
 }
