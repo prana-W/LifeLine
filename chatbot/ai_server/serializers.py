@@ -13,3 +13,5 @@ class GetRouteSerializer(serializers.Serializer):
 class MessageSerializer(serializers.Serializer):
     message = serializers.CharField(max_length=20000)
 
+class InterpretSerializer(serializers.Serializer):
+    unformatted_data = serializers.JSONField()

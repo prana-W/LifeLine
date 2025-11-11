@@ -1,5 +1,26 @@
 import google.generativeai as genai
 from django.conf import settings
+import json
+
+
+def generate_human_readable_message(data: dict) -> str:
+    genai.configure(api_key=settings.GOOGLE_CLOUD_API_KEY)
+    model = genai.GenerativeModel('gemini-2.5-flash')
+    
+    json_data = json.dumps(data, indent=2)
+    
+    prompt = f"""Convert this JSON data into a clear, human-readable message for LifeLine, a health emergency assistant app which provides assitance regarding donor,medicine availibility ,nearby hospitals and other helpful stuff.
+    Make sure no info is lost and like dont make it too verbose. 
+
+Data:
+{json_data}
+
+Generate a concise, natural message that presents this information in a way users can easily understand. Focus on the most important health-related details. Keep it brief and conversational.
+
+Message:"""
+    
+    response = model.generate_content(prompt)
+    return response.text.strip()
 
 
 def select_route_from_message(message: str, action: str, assist_routes: list, navigate_routes: list) -> str:

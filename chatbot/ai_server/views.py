@@ -2,8 +2,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 
-from .serializers import GetRouteSerializer,MessageSerializer
-from .ai_helper import select_route_from_message
+from .serializers import GetRouteSerializer, MessageSerializer, InterpretSerializer
+from .ai_helper import select_route_from_message, generate_human_readable_message
 
 assist_route_list = [
  '/user/emergency',
@@ -49,9 +49,23 @@ def get_route(request):
 
 @api_view(['POST'])
 def interpret(request):
-    serializer = MessageSerializer(data=request.data)
+    serializer = InterpretSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    return Response(serializer.data)
+    
+    unformatted_data = serializer.validated_data['unformatted_data']
+    
+    try:
+        readable_message = generate_human_readable_message(unformatted_data)
+        return Response({
+            'original_data': unformatted_data,
+            'readable_message': readable_message
+        })
+    except Exception as e:
+        return Response(
+            {'error': f'Failed to interpret data: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
 
 @api_view(['POST'])
 def medical_assist(request):
