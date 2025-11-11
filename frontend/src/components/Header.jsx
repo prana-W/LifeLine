@@ -11,6 +11,8 @@ const Header = () => {
         setRole(storedRole);
     });
 
+
+
     const handleLogout = async () => {
         if (!role || role === 'null') return;
 
