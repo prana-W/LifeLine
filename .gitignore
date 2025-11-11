@@ -5,3 +5,4 @@
 chatbot/.env
 chatbot/__pycache__
 chatbot/ai_server/__pycache__
+/chatbot/db.sqlite3
