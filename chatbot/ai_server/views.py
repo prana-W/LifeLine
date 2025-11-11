@@ -72,3 +72,9 @@ def medical_assist(request):
     serializer = MessageSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     return Response(serializer.data)
+
+@api_view(['GET'])
+def check_health(request):
+    return Response({"message": "Django server is running!"})
+
+
