@@ -1,0 +1,7 @@
+.claude
+.cursor
+.vscode
+.idea
+chatbot/.env
+chatbot/__pycache__
+chatbot/ai_server/__pycache__
