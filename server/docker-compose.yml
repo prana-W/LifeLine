@@ -6,13 +6,9 @@ services:
     container_name: lifeline
     restart: always
     ports:
-      - "8000:8000"
-    environment:
-      - MONGODB_URI=mongodb://mongo:27017/lifeline-db
-      - PORT=8000
-      - ACCESS_TOKEN_SECRET=36b3b81d5a89492d7525093f9d98de66c54c5bca49c285cb545601b3f40138c8c660213ab9f39340f223e95de84bfbc2b4ac2adb22fb7f0efb1f6474f7ce6cc1
-      - ACCESS_TOKEN_EXPIRY=10d
-      - CORS_ORIGIN=http://localhost:5173
+      - "${PORT}:${PORT}"
+    env_file:
+      - .env
     depends_on:
       - mongo
     volumes:
