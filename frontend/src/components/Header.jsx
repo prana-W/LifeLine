@@ -39,9 +39,9 @@ const Header = () => {
         }
     };
 
-    const navigateTo = (path) => {
-        window.location.href = path;
-    };
+  const navigateTo = (path) => {
+    window.location.href = path;
+  };
 
     const getThemeColors = () => {
         switch (role) {
