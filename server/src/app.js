@@ -24,7 +24,6 @@ app.use(morgan('dev', {skip: skipMorgan}));
 
 const allowedOrigins = process.env.CORS_ORIGIN.split(',') || []
 
-
 app.use((req, res, next) => {
     res.setHeader('ngrok-skip-browser-warning', 'true');
     next();
@@ -32,7 +31,7 @@ app.use((req, res, next) => {
 
 app.use(
     cors({
-        origin: 'http://localhost:5173',
+        origin: allowedOrigins,
         credentials: true,
     })
 );
