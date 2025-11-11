@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import EmergencyAlertBanner from "@/components/EmergencyAlert.jsx";
 import MultiLangTypewriter from "@/components/general/Typewriter.jsx";
+import Timeline from "@/components/general/Timeline.jsx";
 
 export default function HomePage() {
     const [role, setRole] = useState(null);
@@ -36,7 +37,38 @@ export default function HomePage() {
 
 /* --------------------- NO ROLE (Main Landing Page) --------------------- */
 function NoRoleHome({ navigate }) {
+
+    // Facility timeline data
+    const facilityData = [
+        {
+            image: "https://images.unsplash.com/photo-1581291518857-4e27b48ff24e",
+            title: "Emergency Alert System",
+            desc: "Raise an emergency alert in one tap."
+        },
+        {
+            image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b",
+            title: "Blood Donation Portal",
+            desc: "Request or donate blood instantly."
+        },
+        {
+            image: "./Timeline/emergency.jpg",
+            title: "One Click Ambulance",
+            desc: "Call an ambulance with a single click."
+        },
+        {
+            image: "./Timeline/inventory.jpg",
+            title: "Pharmacy Inventory",
+            desc: "Manage and track medicine stock."
+        },
+        {
+            image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d",
+            title: "Unified Healthcare Network",
+            desc: "Connecting users, hospitals and pharmacies."
+        }
+    ];
+
     return (
+        <>
         <section
             className="relative min-h-[calc(100vh-100px)] overflow-hidden flex items-center"
             style={{ backgroundColor: "#4AD2CC" }}
@@ -54,16 +86,14 @@ function NoRoleHome({ navigate }) {
             </div>
 
             {/* Content Wrapper */}
-            <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 w-full grid md:grid-cols-2 gap-8 items-center ">
+            <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 w-full grid md:grid-cols-2 gap-8 items-center">
 
                 {/* LEFT SECTION */}
                 <div className="space-y-6 py-16 md:py-0">
-                    {/* Icon */}
                     <div className="animate-pulse">
                         <Activity className="h-16 w-16 text-white" />
                     </div>
 
-                    {/* Headline */}
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight inline-block -translate-x-10">
                         <MultiLangTypewriter
                             texts={[
@@ -73,37 +103,20 @@ function NoRoleHome({ navigate }) {
                         />
                     </h1>
 
-                    {/* Subheading */}
                     <p className="text-white text-lg md:text-xl opacity-90 max-w-md">
                         Lifeline brings hospitals, pharmacies, and emergency help together in one seamless platform.
                     </p>
 
-                    {/* Buttons → Replaced with your role cards trigger */}
-                    <div className="space-y-4 max-w-sm ">
-                        <button
-                            onClick={() => navigate("/hospital/auth")}
-                            className="w-full py-4 bg-cyan-600 text-white font-medium rounded-full hover:scale-105 transition"
-                        >
-                            Hospital Portal
-                        </button>
+                    <div className="space-y-4 max-w-sm">
+                        <button onClick={() => navigate("/hospital/auth")} className="w-full py-4 bg-cyan-600 text-white font-medium rounded-full hover:scale-105 transition">Hospital Portal</button>
 
-                        <button
-                            onClick={() => navigate("/pharmacy/auth")}
-                            className="w-full py-4  bg-cyan-600 text-white font-medium rounded-full hover:scale-105 transition"
-                        >
-                            Pharmacy Portal
-                        </button>
+                        <button onClick={() => navigate("/pharmacy/auth")} className="w-full py-4 bg-cyan-600 text-white font-medium rounded-full hover:scale-105 transition">Pharmacy Portal</button>
 
-                        <button
-                            onClick={() => navigate("/user/auth")}
-                            className="w-full py-4 bg-cyan-600 text-white font-medium rounded-full hover:scale-105 transition"
-                        >
-                            User Portal
-                        </button>
+                        <button onClick={() => navigate("/user/auth")} className="w-full py-4 bg-cyan-600 text-white font-medium rounded-full hover:scale-105 transition">User Portal</button>
                     </div>
                 </div>
 
-                {/* RIGHT SECTION → Doctor Image */}
+                {/* RIGHT SECTION */}
                 <div className="relative flex items-end justify-end h-full">
                     <img
                         src="/doctorwithlaptop.png"
@@ -113,8 +126,19 @@ function NoRoleHome({ navigate }) {
                 </div>
             </div>
         </section>
+
+        {/* FACILITIES TIMELINE SECTION */}
+        <section className="w-full bg-white py-16 mt-10 rounded-t-3xl shadow-inner">
+            <h2 className="text-center text-4xl font-bold text-teal-700 mb-10">
+                Facilities We Offer
+            </h2>
+
+            <Timeline items={facilityData} gap={80} />
+        </section>
+        </>
     );
 }
+
 
 
 /* --------------------- ROLE-BASED HOME --------------------- */
