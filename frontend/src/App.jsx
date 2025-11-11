@@ -49,7 +49,7 @@ const router = createBrowserRouter([
             },
             {
                 path: '/hospital/bloodDonationHospitalPage',
-                element: <BloodDonationHospitalPage />,
+                element: <BloodDonationHospitalPage />, 
             },
             {
                 path: '/user/bloodDonationUserPage',
