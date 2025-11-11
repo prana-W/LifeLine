@@ -20,12 +20,18 @@ export default function AboutUs() {
     { 
       name: "Pranaw Kumar", 
       role: "Backend Developer",
-      github: "https://github.com/prana-W/",
+      github: "https://github.com/prana-W",
       linkedin: "https://www.linkedin.com/in/pranaw-kumar-710331215/"
     },
-    { 
+      {
+          name: "Sisanta Chhatoi",
+          role: "AI/ML and DevOps Developer",
+          github: "https://github.com/sisantaChhatoi",
+          linkedin: "https://www.linkedin.com/in/sisanta-chhatoi-229aa5321/"
+      },
+      {
       name: "Ruchika Ruhanshi", 
-      role: "Frontend Developer",
+      role: "UI/UX and Designer",
       github: "https://github.com/RuchikaRuhanshi",
       linkedin: "https://www.linkedin.com/in/ruchika-ruhanshi/"
     }

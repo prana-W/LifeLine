@@ -130,15 +130,16 @@ The system uses **MongoDB** with the following collections:
 | OpenStreet Map | Mapping & routing |
 
 
-## 👥 Authors
+## 👥 Team
 
 **Team Hawkins Horizon**
 
-| Team Member | Role | Responsibilities |
-|-------------|------|------------------|
-| **Pranaw Kumar** | Backend Developer | API development, database design, authentication & security |
-| **Ashutosh Kumar Rawat** | Frontend Developer | React components, UI implementation, API integration |
-| **Ruchika Ruhanshi** | UI/UX Designer & Project Manager | Design systems, user experience, project coordination & brainstorming |
+| Team Member | Role                      | Responsibilities                                                      |
+|------|---------------------------|-----------------------------------------------------------------------|
+| **Pranaw Kumar** | Backend Developer         | API development, database design, authentication & security           |
+| **Sisanta Chhatoi** | AI/ML Developer           | AI Chatbot development, devops and deployment                         |
+| **Ashutosh Kumar Rawat** | Frontend Developer        | React components, UI implementation, API integration                  |
+| **Ruchika Ruhanshi** | UI/UX Designer & Designer | Design systems, user experience, project coordination & brainstorming |
 
 ## 📞 Support
 
