@@ -132,7 +132,7 @@ function NoRoleHome({ navigate }) {
     return (
         <>
             <section
-                className="relative min-h-[calc(100vh-100px)] overflow-hidden flex items-center"
+                className="relative min-h-[calc(100vh-100px)] overflow-hidden flex items-center "
                 style={{ backgroundColor: "#4AD2CC" }}
             >
                 {/* Grid Background */}
