@@ -195,64 +195,99 @@ const requestBloodEmergency = asyncHandler(async (req, res) => {
     const user = await User.findById(userId);
 
     if (!user) {
-        throw new ApiError(statusCode.BAD_REQUEST, 'User not found!');
+        throw new ApiError(statusCode.BAD_REQUEST, "User not found!");
     }
-    
-    const {bloodType, name:patientName, pinCode, phoneNumber} = user;
 
-    console.log('Received blood request:', {
+    const {
+        pinCode: bodyPincode,
+        latitude,
+        longitude,
+        location,
+        city,
+        state,
+    } = req.body;
+
+    const {
         bloodType,
-        patientName
+        name: patientName,
+        pinCode: userPincode,
+        phoneNumber,
+    } = user;
+
+    // Choose the most accurate pincode (frontend > user)
+    const pinCode = bodyPincode || userPincode;
+
+    console.log("📍 Received blood request:", {
+        bloodType,
+        patientName,
+        pinCode,
+        city,
+        state,
+        location,
     });
 
-    // Validate required fields
     if (!bloodType || !pinCode) {
         throw new ApiError(
             statusCode.BAD_REQUEST,
-            'Blood type and location details are required'
+            "Blood type and pincode are required."
         );
     }
 
     if (!phoneNumber) {
-        throw new ApiError(statusCode.BAD_REQUEST, 'Contact number is required');
+        throw new ApiError(statusCode.BAD_REQUEST, "Contact number is required.");
     }
 
     if (!patientName) {
-        throw new ApiError(statusCode.BAD_REQUEST, 'Patient name is required');
+        throw new ApiError(statusCode.BAD_REQUEST, "Patient name is required.");
     }
 
-    // Validate blood type
-    const validBloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+    const validBloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
     if (!validBloodTypes.includes(bloodType)) {
         throw new ApiError(
             statusCode.BAD_REQUEST,
-            `Invalid blood type. Must be one of: ${validBloodTypes.join(', ')}`
+            `Invalid blood type. Must be one of: ${validBloodTypes.join(", ")}`
         );
     }
 
-    const hospitals = await Hospital.find({ pinCode: pinCode });
+    const hospitals = await Hospital.find({ pinCode });
 
-    // Create blood request emergency
+    if (!hospitals.length) {
+        console.warn("⚠️ No hospitals found for pincode:", pinCode);
+    }
+
     const bloodRequest = await Emergency.create({
         user: userId,
-        type: 'blood',
+        type: "blood",
         hospitalsNotified: hospitals.map((h) => h._id),
         pinCode,
+        location: {
+            latitude,
+            longitude,
+            address: location || "Location not provided",
+            city: city || "Unknown",
+            state: state || "Unknown",
+        },
         bloodRequest: {
             bloodType,
             patientName,
             phoneNumber,
         },
-        timestamp: new Date()
+        timestamp: new Date(),
+        status: "pending",
     });
 
-    return res.status(statusCode.CREATED).json(
-        new ApiResponse(
-            statusCode.CREATED,
-            'Blood request was raised at all the nearby hospitals!'
-        )
-    );
+    console.log("✅ Blood emergency created:", bloodRequest._id);
+
+    return res
+        .status(statusCode.CREATED)
+        .json(
+            new ApiResponse(
+                statusCode.CREATED,
+                "Blood emergency request raised successfully and nearby hospitals notified!"
+            )
+        );
 });
+
 
 /**
  * Get blood request details
