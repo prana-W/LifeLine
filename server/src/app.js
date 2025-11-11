@@ -11,6 +11,7 @@ import hospitalAuthRouter from './routes/hospitalAuth.routes.js';
 import hospitalRouter from './routes/hospital.routes.js';
 import userAuthRouter from './routes/userAuth.routes.js';
 import userRouter from './routes/user.routes.js';
+import analyticsRouter from './routes/analytics.routes.js'
 import path from "path";
 
 const app = express();
@@ -60,6 +61,7 @@ app.use('/api/v1/user/auth', userAuthRouter);
 app.use('/api/v1/pharmacy', pharmacyRouter);
 app.use('/api/v1/hospital', hospitalRouter);
 app.use('/api/v1/user', userRouter);
+app.use('/api/v1/analytics', analyticsRouter)
 
 // Error Handling
 app.use(errorHandler());
