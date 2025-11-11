@@ -27,6 +27,7 @@ import {
 import EmergencyAlertBanner from "@/components/EmergencyAlert.jsx";
 import MultiLangTypewriter from "@/components/general/Typewriter.jsx";
 import Timeline from "@/components/general/Timeline.jsx";
+import MagneticPortalButtons from "@/components/general/MagneticButton.jsx";
 
 
 function ManagementCard({ icon, title, description, color }) {
@@ -163,7 +164,7 @@ function NoRoleHome({ navigate }) {
                             <Activity className="h-16 w-16 text-white" />
                         </div>
 
-                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight inline-block -translate-x-10">
+                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight inline-block -translate-x-5">
                             <MultiLangTypewriter
                                 texts={[
                                     "Welcome to Lifeline",
@@ -177,7 +178,7 @@ function NoRoleHome({ navigate }) {
                         </p>
 
                         {/* Rotating Features */}
-                        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 max-w-md">
+                        {/* <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 max-w-md">
                             <div className="flex items-center gap-3 text-white transition-all duration-500">
                                 <div className="transform transition-transform duration-500 scale-110">
                                     {features[activeFeature].icon}
@@ -195,15 +196,9 @@ function NoRoleHome({ navigate }) {
                                     />
                                 ))}
                             </div>
-                        </div>
+                        </div> */}
 
-                        <div className="space-y-4 max-w-sm">
-                            <button onClick={() => navigate("/hospital/auth")} className="w-full py-4 bg-cyan-600 text-white font-medium rounded-full hover:scale-105 transition shadow-lg hover:shadow-xl">Hospital Portal</button>
-
-                            <button onClick={() => navigate("/pharmacy/auth")} className="w-full py-4 bg-cyan-600 text-white font-medium rounded-full hover:scale-105 transition shadow-lg hover:shadow-xl">Pharmacy Portal</button>
-
-                            <button onClick={() => navigate("/user/auth")} className="w-full py-4 bg-cyan-600 text-white font-medium rounded-full hover:scale-105 transition shadow-lg hover:shadow-xl">User Portal</button>
-                        </div>
+                        <MagneticPortalButtons navigate={navigate} />
                     </div>
 
                     {/* RIGHT SECTION */}

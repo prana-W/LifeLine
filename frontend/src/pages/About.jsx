@@ -277,7 +277,7 @@ export default function AboutUs() {
             The minds behind Lifeline
           </p>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 gap-10">
             {team.map((member, idx) => (
               <div 
                 key={idx}
