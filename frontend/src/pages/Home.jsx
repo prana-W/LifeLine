@@ -10,6 +10,7 @@ import {
     Pill,
 } from "lucide-react";
 import EmergencyAlertBanner from "@/components/EmergencyAlert.jsx";
+import MultiLangTypewriter from "@/components/general/Typewriter.jsx";
 
 export default function HomePage() {
     const [role, setRole] = useState(null);
@@ -36,53 +37,85 @@ export default function HomePage() {
 /* --------------------- NO ROLE (Main Landing Page) --------------------- */
 function NoRoleHome({ navigate }) {
     return (
-        <div className="flex flex-col items-center justify-center flex-1 text-center px-6">
-            <h1 className="text-4xl font-bold mb-4">Welcome to Lifeline</h1>
-            <p className="text-lg text-teal-100 mb-10 max-w-xl">
-                A unified emergency response and healthcare assistance platform.
-                <br /> Please select your role to continue.
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-3xl">
-                <RoleCard
-                    title="Hospital Portal"
-                    icon={<Building2 className="w-10 h-10 mb-3" />}
-                    color="from-rose-500 to-red-600"
-                    onClick={() => navigate("/hospital/auth")}
-                />
-
-                <RoleCard
-                    title="Pharmacy Portal"
-                    icon={<Pill className="w-10 h-10 mb-3" />}
-                    color="from-emerald-500 to-teal-600"
-                    onClick={() => navigate("/pharmacy/auth")}
-                />
-
-                <RoleCard
-                    title="User Portal"
-                    icon={<Users className="w-10 h-10 mb-3" />}
-                    color="from-blue-500 to-indigo-600"
-                    onClick={() => navigate("/user/auth")}
-                />
+        <section
+            className="relative min-h-[calc(100vh-100px)] overflow-hidden flex items-center"
+            style={{ backgroundColor: "#4AD2CC" }}
+        >
+            {/* Grid Background */}
+            <div className="absolute inset-0 opacity-30">
+                <div
+                    className="h-full w-full"
+                    style={{
+                        backgroundImage:
+                            "linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)",
+                        backgroundSize: "50px 50px",
+                    }}
+                ></div>
             </div>
 
+            {/* Content Wrapper */}
+            <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 w-full grid md:grid-cols-2 gap-8 items-center ">
 
-        </div>
+                {/* LEFT SECTION */}
+                <div className="space-y-6 py-16 md:py-0">
+                    {/* Icon */}
+                    <div className="animate-pulse">
+                        <Activity className="h-16 w-16 text-white" />
+                    </div>
+
+                    {/* Headline */}
+                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight inline-block -translate-x-10">
+                        <MultiLangTypewriter
+                            texts={[
+                                "Welcome to Lifeline",
+                                "स्वागत है लाइफलाइन में",
+                            ]}
+                        />
+                    </h1>
+
+                    {/* Subheading */}
+                    <p className="text-white text-lg md:text-xl opacity-90 max-w-md">
+                        Lifeline brings hospitals, pharmacies, and emergency help together in one seamless platform.
+                    </p>
+
+                    {/* Buttons → Replaced with your role cards trigger */}
+                    <div className="space-y-4 max-w-sm ">
+                        <button
+                            onClick={() => navigate("/hospital/auth")}
+                            className="w-full py-4 bg-cyan-600 text-white font-medium rounded-full hover:scale-105 transition"
+                        >
+                            Hospital Portal
+                        </button>
+
+                        <button
+                            onClick={() => navigate("/pharmacy/auth")}
+                            className="w-full py-4  bg-cyan-600 text-white font-medium rounded-full hover:scale-105 transition"
+                        >
+                            Pharmacy Portal
+                        </button>
+
+                        <button
+                            onClick={() => navigate("/user/auth")}
+                            className="w-full py-4 bg-cyan-600 text-white font-medium rounded-full hover:scale-105 transition"
+                        >
+                            User Portal
+                        </button>
+                    </div>
+                </div>
+
+                {/* RIGHT SECTION → Doctor Image */}
+                <div className="relative flex items-end justify-end h-full">
+                    <img
+                        src="/doctorwithlaptop.png"
+                        alt="Doctor with Laptop"
+                        className="w-full h-[500px] scale-[120%] object-contain drop-shadow-2xl translate-x-10"
+                    />
+                </div>
+            </div>
+        </section>
     );
 }
 
-function RoleCard({ title, icon, color, onClick }) {
-    return (
-        <div
-            onClick={onClick}
-            className={`bg-gradient-to-r ${color} p-8 rounded-2xl shadow-lg cursor-pointer hover:scale-[1.05] transform transition-all text-white`}
-        >
-            {icon}
-            <h3 className="text-xl font-semibold">{title}</h3>
-            <p className="text-white/70 text-sm mt-2">Login or Register</p>
-        </div>
-    );
-}
 
 /* --------------------- ROLE-BASED HOME --------------------- */
 function RoleBasedHome({ role, navigate }) {
