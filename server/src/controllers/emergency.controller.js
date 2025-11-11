@@ -189,70 +189,102 @@ const callAmbulance = asyncHandler(async (req, res) => {
  * POST /api/v1/user/blood-request
  */
 const requestBloodEmergency = asyncHandler(async (req, res) => {
-
     const userId = req.userId;
+    const { pincode, latitude, longitude, location, city, state } = req.body;
+
+    if (!pincode || !latitude || !longitude) {
+        throw new ApiError(statusCode.BAD_REQUEST, "Missing required location details");
+    }
 
     const user = await User.findById(userId);
-
     if (!user) {
-        throw new ApiError(statusCode.BAD_REQUEST, 'User not found!');
+        throw new ApiError(statusCode.BAD_REQUEST, "User not found!");
     }
-    
-    const {bloodType, name:patientName, pinCode, phoneNumber} = user;
 
-    console.log('Received blood request:', {
-        bloodType,
-        patientName
-    });
+    const { bloodType, name: patientName, phoneNumber } = user;
 
-    // Validate required fields
-    if (!bloodType || !pinCode) {
-        throw new ApiError(
-            statusCode.BAD_REQUEST,
-            'Blood type and location details are required'
-        );
+    if (!bloodType) {
+        throw new ApiError(statusCode.BAD_REQUEST, "Blood type is required.");
     }
 
     if (!phoneNumber) {
-        throw new ApiError(statusCode.BAD_REQUEST, 'Contact number is required');
+        throw new ApiError(statusCode.BAD_REQUEST, "Contact number is required.");
     }
 
     if (!patientName) {
-        throw new ApiError(statusCode.BAD_REQUEST, 'Patient name is required');
+        throw new ApiError(statusCode.BAD_REQUEST, "Patient name is required.");
     }
 
-    // Validate blood type
-    const validBloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+    const validBloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
     if (!validBloodTypes.includes(bloodType)) {
         throw new ApiError(
             statusCode.BAD_REQUEST,
-            `Invalid blood type. Must be one of: ${validBloodTypes.join(', ')}`
+            `Invalid blood type. Must be one of: ${validBloodTypes.join(", ")}`
         );
     }
 
-    const hospitals = await Hospital.find({ pinCode: pinCode });
+    const hospitals = await Hospital.find({ pinCode: pincode });
 
-    // Create blood request emergency
     const bloodRequest = await Emergency.create({
         user: userId,
-        type: 'blood',
+        type: "blood",
         hospitalsNotified: hospitals.map((h) => h._id),
-        pinCode,
+        pinCode: pincode,
+        location: {
+            latitude: parseFloat(latitude),
+            longitude: parseFloat(longitude),
+            address: location || "Location not provided",
+            city: city || "Unknown",
+            state: state || "Unknown",
+        },
         bloodRequest: {
             bloodType,
             patientName,
             phoneNumber,
         },
-        timestamp: new Date()
+        timestamp: new Date(),
+        status: "pending",
     });
 
+
+    // 📨 Prepare a consistent response
+    let responseMessage = "";
+    let responseData = {
+        emergencyId: bloodRequest._id,
+        type: "blood",
+        hospitalsCount: hospitals.length,
+        bloodDetails: {
+            bloodType,
+            patientName,
+            phoneNumber,
+        },
+        location: {
+            pinCode: pincode,
+            coordinates: {
+                latitude: parseFloat(latitude),
+                longitude: parseFloat(longitude),
+            },
+            address: location,
+            city,
+            state,
+        },
+    };
+
+    if (!hospitals.length) {
+        responseMessage = `Blood request registered. Warning: No hospitals found in pincode ${pincode}. Emergency services will be notified manually.`;
+        responseData.warning = `No hospitals found in pincode: ${pincode}`;
+        responseData.hospitalsNotified = false;
+    } else {
+        responseMessage = "Blood emergency request raised successfully and nearby hospitals notified.";
+        responseData.hospitalsNotified = true;
+    }
+
     return res.status(statusCode.CREATED).json(
-        new ApiResponse(
-            statusCode.CREATED,
-            'Blood request was raised at all the nearby hospitals!'
-        )
+        new ApiResponse(statusCode.CREATED, responseMessage, responseData)
     );
 });
+
+
 
 /**
  * Get blood request details

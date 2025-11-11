@@ -51,7 +51,7 @@ export default function EmergencyDashboard() {
     const handleSolve = async (id) => {
         const { success } = await apiRef.current.put(`/hospital/solveEmergency/${id}`, {});
         if (success) {
-            toast.success("Emergency marked as solved!");
+            // toast.success("Emergency marked as solved!");
             // Move to resolved locally
             setEmergencies((prev) =>
                 prev.map((e) =>
@@ -146,8 +146,6 @@ export default function EmergencyDashboard() {
                                 </div>
 
                                 <div className="flex flex-col items-end gap-1">
-
-
                                     {/* Type Tag */}
                                     <span
                                         className={`text-xs px-2 py-1 rounded capitalize ${
@@ -189,7 +187,9 @@ export default function EmergencyDashboard() {
                                     <Hospital className="w-5 h-5" />
                                     <span>
           Notified Hospitals:{" "}
-                                        {alert.hospitalsNotified?.length ? alert.hospitalsNotified.length : "None"}
+                                        {alert.hospitalsNotified?.length
+                                            ? alert.hospitalsNotified.length
+                                            : "None"}
         </span>
                                 </p>
                                 <p className="flex items-center gap-2">
@@ -202,8 +202,9 @@ export default function EmergencyDashboard() {
                                 </p>
                             </div>
 
-                            {/* Media / Map Display */}
+                            {/* MEDIA / TYPE DISPLAY */}
                             {alert.type === "ambulance" ? (
+                                // 🏥 Ambulance Emergency
                                 alert.location?.latitude && alert.location?.longitude ? (
                                     <iframe
                                         title="User Live Location"
@@ -217,39 +218,66 @@ export default function EmergencyDashboard() {
                                 ) : (
                                     <p className="text-white/70 italic">Location data unavailable.</p>
                                 )
+                            ) : alert.type === "blood" ? (
+                                // 🩸 Blood Emergency
+                                <div className="flex flex-col items-center justify-center h-48 border border-pink-400/30 rounded-lg bg-pink-500/10">
+                                    <p className="text-7xl font-extrabold text-pink-300 drop-shadow-lg">
+                                        {alert.user?.bloodType || "N/A"}
+                                    </p>
+                                    <p className="text-sm text-white/70 mt-2">Blood Group Needed</p>
+                                </div>
                             ) : alert.audioVideoUrl ? (
+                                // 🎥 Generic Emergency
                                 <video
                                     src={`${import.meta.env.VITE_SERVER_BASE_URL}${alert.audioVideoUrl}`}
                                     controls
                                     className="w-full aspect-video max-h-64 object-cover rounded-lg border border-white/20 shadow-md"
                                 />
                             ) : (
-                                <p className="text-white/70 italic">No video available.</p>
+                                <p className="text-white/70 italic">No media available.</p>
                             )}
 
-                            {/* Actions */}
+                            {/* ACTIONS */}
                             <div className="flex flex-col sm:flex-row items-center justify-between mt-5 gap-3">
-                                <div className="flex flex-wrap items-center gap-3">
+                                {alert.type === "ambulance" ? (
                                     <Button
-                                        onClick={() =>
-                                            handleShowLocation(alert.location?.latitude, alert.location?.longitude)
-                                        }
-                                        className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
+                                        onClick={() => {
+                                            handleSolve(alert._id);
+                                            toast.success("Ambulance has been assigned and sent to the location!");
+                                        }}
+                                        className="bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-2"
                                     >
-                                        <Map className="w-5 h-5" />
-                                        Show Live Location
+                                        🚑 Assign Ambulance
                                     </Button>
-
+                                ) : alert.type === "blood" ? (
+                                    <Button
+                                        onClick={() => {
+                                            handleSolve(alert._id);
+                                            toast.success("Blood unit preparation has started!");
+                                        }}
+                                        className="bg-pink-600 hover:bg-pink-700 text-white flex items-center gap-2"
+                                    >
+                                        🩸 Start Preparing
+                                    </Button>
+                                ) : (
+                                    // Default solve option for other emergencies
                                     <label className="flex items-center gap-2 text-white font-semibold">
                                         <input
                                             type="checkbox"
                                             className="scale-125 accent-green-500"
-                                            onChange={() => handleSolve(alert._id)}
-                                        />
-                                        Mark as solved
-                                    </label>
-                                </div>
+                                            onChange={
+                                            () => {
+                                                handleSolve(alert._id);
+                                                toast.success("Emergency was marked as solved!");
+                                            }
 
+                                        }
+                                        />
+                                        Mark as Solved
+                                    </label>
+                                )}
+
+                                {/* Delete Button */}
                                 <Button
                                     onClick={() => handleDelete(alert._id)}
                                     className="bg-red-600 hover:bg-red-700 text-white flex items-center gap-2"
@@ -259,6 +287,7 @@ export default function EmergencyDashboard() {
                             </div>
                         </div>
                     ))}
+
 
                 </div>
             </section>
