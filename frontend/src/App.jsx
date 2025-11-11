@@ -1,4 +1,5 @@
-import {Home, About, NotFound, Test} from './pages';
+import {Home, NotFound, Test} from './pages';
+import About from './pages/About.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import { ThemeProvider } from "@/components/theme-provider"
 import Layout from './Layout.jsx';
@@ -7,12 +8,11 @@ import HospitalAuth from './pages/Hospital/HospitalAuth.jsx';
 import UserAuth from './pages/User/UserAuth.jsx';
 import BloodDonationHospitalPage from './pages/Hospital/BloodDonationHospitalPage.jsx';
 import BloodDonationUserPage from './pages/User/BloodDonationUserPage.jsx';
-import HospitalDashboard from './pages/Hospital/Dashboard.jsx';
 import BloodReceive from './pages/User/BloodReceive.jsx';
-
+import Analytics from './pages/Analytics.jsx'
 import {createBrowserRouter, RouterProvider} from 'react-router-dom';
 import PharmacyAuth from './pages/Pharmacy/PharmacyAuth.jsx';
-import Dashboard from './pages/Hospital/Dashboard.jsx';
+import EmergencyDashboard from './pages/Hospital/EmergencyDashboard.jsx';
 
 const router = createBrowserRouter([
     {
@@ -24,11 +24,11 @@ const router = createBrowserRouter([
                 element: <Home />,
             },
             {
-                path: 'about',
+                path: '/about',
                 element: <About />,
             },
             {
-                path: 'test',
+                path: '/test',
                 element: <Test />,
             },
             {
@@ -61,7 +61,12 @@ const router = createBrowserRouter([
             },
             {
                 path: '/hospital/emergencies',
-                element: <Dashboard />,
+                element: <EmergencyDashboard />,
+            },
+
+            {
+                path: '/analytics',
+                element: <Analytics />,
             },
             
             {

@@ -234,7 +234,7 @@ export default function Footer() {
               {/* SOCIAL LINKS */}
               <div className="flex items-center space-x-3 mt-4">
                 <a 
-                  href="https://github.com" 
+                  href="https://github.com/prana-W/LifeLine"
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-all hover:scale-110"

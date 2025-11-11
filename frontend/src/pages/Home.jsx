@@ -192,6 +192,24 @@ function PharmacyHome({ navigate }) {
 import AmbulanceAlert from "@/components/AmbulanceAlert.jsx"
 
 function UserHome({ navigate }) {
+    // Function to open hospital map in a new tab
+    const openMap = () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    const { latitude, longitude } = pos.coords;
+                    const mapsUrl = `https://www.google.com/maps/search/hospitals/@${latitude},${longitude},14z`;
+                    window.open(mapsUrl, "_blank");
+                },
+                () => {
+                    toast.error("Unable to fetch your location. Please enable location access.");
+                }
+            );
+        } else {
+            toast.error("Geolocation is not supported on your device.");
+        }
+    };
+
     return (
         <>
             {/* HERO SECTION */}
@@ -241,17 +259,23 @@ function UserHome({ navigate }) {
                         <ServiceCard
                             title="Request Blood"
                             icon={<HeartPulse />}
-                            onClick={() => navigate("/blood-donation")}
+                            onClick={() => navigate("/user/receiveBlood")}
                         />
+
+                        {/* Scroll to top smoothly */}
                         <ServiceCard
                             title="Report Emergency"
                             icon={<AlertCircle />}
-                            onClick={() => navigate("/emergency")}
+                            onClick={() => {
+                                window.scrollTo({ top: 0, behavior: "smooth" });
+                            }}
                         />
+
+                        {/* Open Google Maps in a new tab */}
                         <ServiceCard
                             title="View Emergency Map"
                             icon={<Activity />}
-                            onClick={() => navigate("/dashboard")}
+                            onClick={openMap}
                         />
                     </div>
                 </div>
@@ -259,6 +283,7 @@ function UserHome({ navigate }) {
         </>
     );
 }
+
 
 
 /* --------------------- REUSABLE COMPONENTS --------------------- */

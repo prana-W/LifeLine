@@ -147,7 +147,9 @@ export default function HospitalAuth() {
     try {
       const res = await fetch(`${API_BASE_URL}/hospital/auth/login`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true'
+        },
         credentials: 'include',
         body: JSON.stringify(loginForm)
       });

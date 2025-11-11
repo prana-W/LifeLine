@@ -26,20 +26,25 @@ const useApi = (baseURL = import.meta.env.VITE_SERVER_URL) => {
             // ✅ Auto-handle FormData vs JSON
             if (body && method !== 'GET' && method !== 'DELETE') {
                 if (body instanceof FormData) {
-                    // Don’t set Content-Type, browser will do it
+                    // Don't set Content-Type, browser will do it
                     config.body = body;
-                    config.headers = { ...headers };
+                    config.headers = {
+                        'ngrok-skip-browser-warning': 'true', // Add this
+                        ...headers
+                    };
                 } else {
                     // Normal JSON request
                     config.body = JSON.stringify(body);
                     config.headers = {
                         'Content-Type': 'application/json',
+                        'ngrok-skip-browser-warning': 'true', // Add this
                         ...headers,
                     };
                 }
             } else {
                 config.headers = {
                     'Content-Type': 'application/json',
+                    'ngrok-skip-browser-warning': 'true', // Add this
                     ...headers,
                 };
             }
