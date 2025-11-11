@@ -1,13 +1,51 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework import status
 
 from .serializers import GetRouteSerializer,MessageSerializer
+from .ai_helper import select_route_from_message
+
+assist_route_list = [
+ '/user/emergency',
+ '/user/ambulance',
+'/user/raise_blood_request'
+]
+
+navigate_route_list = []
 
 @api_view(['POST'])
 def get_route(request):
     serializer = GetRouteSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    return Response(serializer.data)
+    
+    message = serializer.validated_data['message']
+    action = serializer.validated_data['action']
+    
+    try:
+        selected_route = select_route_from_message(
+            message=message,
+            action=action,
+            assist_routes=assist_route_list,
+            navigate_routes=navigate_route_list
+        )
+        
+        if selected_route is None:
+            return Response(
+                {'error': f'No routes available for action type: {action}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        return Response({
+            'message': message,
+            'action': action,
+            'selected_route': selected_route
+        })
+    
+    except Exception as e:
+        return Response(
+            {'error': f'Failed to select route: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
 @api_view(['POST'])
 def interpret(request):
