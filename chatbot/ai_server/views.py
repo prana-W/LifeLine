@@ -8,7 +8,7 @@ from .ai_helper import select_route_from_message, generate_human_readable_messag
 assist_route_list = [
  '/user/emergency',
  '/user/ambulance',
-'/user/raise_blood_request'
+'/user/raiseBloodRequest'
 ]
 
 navigate_route_list = []

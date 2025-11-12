@@ -50,13 +50,14 @@ const createEmergencyAlert = asyncHandler(async (req, res) => {
         throw new ApiError(statusCode.BAD_REQUEST, 'Missing required location details');
     }
 
-    if (!req.file) {
-        throw new ApiError(statusCode.BAD_REQUEST, 'Audio/video recording is required');
-    }
+
 
     const hospitals = await Hospital.find({ pinCode: pincode });
 
-    const localFileUrl = `/uploads/emergencies/${req.file.filename}`;
+    let localFileUrl;
+
+    if (req?.file?.filename) localFileUrl = `/uploads/emergencies/${req.file.filename}`;
+    else localFileUrl = `NA`;
 
     const emergency = await Emergency.create({
         user: userId,
