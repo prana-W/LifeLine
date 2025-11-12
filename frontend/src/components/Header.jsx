@@ -1,262 +1,258 @@
-import { useState, useEffect } from 'react';
-import { LogOut, User, Activity, Droplet, LayoutDashboard } from 'lucide-react';
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import {
+    LogOut,
+    User,
+    Activity,
+    Droplet,
+    LayoutDashboard,
+    X,
+    ChevronRight,
+    ChevronLeft
+} from "lucide-react";
 
-const Header = () => {
+export default function SidebarWithToggle() {
     const [role, setRole] = useState(null);
-    const navigate = useNavigate();
+    const [isOpen, setIsOpen] = useState(false);
 
+    // Load role
     useEffect(() => {
-        const storedRole = localStorage.getItem('role');
+        const storedRole = localStorage.getItem("role");
         setRole(storedRole);
-    });
+    }, []);
 
-
+    const navigateTo = (path) => {
+        window.location.href = path;
+        setIsOpen(false);
+    };
 
     const handleLogout = async () => {
-        if (!role || role === 'null') return;
+        if (!role || role === "null") return;
 
         try {
-            const res = await fetch(
+            await fetch(
                 `${import.meta.env.VITE_SERVER_URL}/${role}/logout`,
                 {
-                    method: 'POST',
-                    credentials: 'include',
-                    headers: {
-                        'ngrok-skip-browser-warning': 'true'
-                    },
+                    method: "POST",
+                    credentials: "include",
+                    headers: { "ngrok-skip-browser-warning": "true" }
                 }
             );
-
-            if (!res.ok) {
-                console.error('Logout failed on server');
-            }
-        } catch (error) {
-            console.error('Error during logout:', error);
+        } catch (err) {
+            console.log("Logout error");
         } finally {
-            localStorage.removeItem('accessToken');
-            localStorage.setItem('role', 'null');
-            setRole(null);
-            window.location.href = '/';
+            localStorage.removeItem("accessToken");
+            localStorage.setItem("role", "null");
+            window.location.href = "/";
         }
     };
 
-  const navigateTo = (path) => {
-    window.location.href = path;
-  };
-
-    const getThemeColors = () => {
-        switch (role) {
-            case 'pharmacy':
-                return {
-                    gradient: 'from-emerald-700/50 via-emerald-800/50 to-teal-700/50',
-                    border: 'border-emerald-400/30',
-                    text: 'text-emerald-50',
-                    hover: 'hover:bg-emerald-400/20',
-                    button: 'bg-emerald-500/80 hover:bg-emerald-600/80'
-                };
-            case 'user':
-                return {
-                    gradient: 'from-blue-700/50 via-indigo-700/50 to-blue-800/50',
-                    border: 'border-blue-400/30',
-                    text: 'text-blue-50',
-                    hover: 'hover:bg-blue-400/20',
-                    button: 'bg-blue-500/80 hover:bg-blue-600/80'
-                };
-            case 'hospital':
-                return {
-                    gradient: 'from-rose-700/50 via-red-700/50 to-rose-800/50',
-                    border: 'border-red-400/30',
-                    text: 'text-red-50',
-                    hover: 'hover:bg-red-400/20',
-                    button: 'bg-red-500/80 hover:bg-red-600/80'
-                };
-            default:
-                return {
-                    gradient: 'from-purple-700/50 via-pink-700/50 to-purple-800/50',
-                    border: 'border-purple-400/30',
-                    text: 'text-purple-50',
-                    hover: 'hover:bg-purple-400/20',
-                    button: 'bg-purple-500/80 hover:bg-purple-600/80'
-                };
-        }
+    /* ✅ STATIC THEME (no dynamic colors anymore) */
+    const theme = {
+        pill: "bg-white/10",
+        text: "text-white",
+        gradient: "from-black/40 via-black/40 to-black/40",
+        button: "bg-teal-600 hover:bg-teal-700"
     };
 
-    const theme = getThemeColors();
+    /* ✅ Side Nav Item */
+    const NavItem = ({ children, onClick, icon: Icon }) => (
+        <button
+            onClick={onClick}
+            className={`relative overflow-hidden w-full px-5 py-2 rounded-full font-medium transition-all duration-300 ${theme.text} group text-left`}
+        >
+            <span
+                className={`absolute inset-0 rounded-full scale-x-0 origin-left ${theme.pill}
+                        transition-transform duration-300 group-hover:scale-x-100`}
+            ></span>
 
-    const renderNavigation = () => {
-        if (!role || role === 'null') {
-            return (
-                <>
-
-                    <button
-                        onClick={() => navigateTo('/analytics')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg ${theme.hover} ${theme.text} transition-all duration-200 font-medium`}
-                    >
-                        <LayoutDashboard size={18} />
-                        Analytics
-                    </button>
-
-                    <button
-                        onClick={() => navigateTo('/about')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg ${theme.hover} ${theme.text} transition-all duration-200 font-medium`}
-                    >
-                        <LayoutDashboard size={18} />
-                        About Us
-                    </button>
-
-                <button
-                    onClick={() => navigateTo('/')}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg ${theme.hover} ${theme.text} transition-all duration-200 font-medium`}
-                >
-                    <User size={18} />
-                    Login
-                </button>
-                        </>
-
-            );
-        }
-
-        switch (role) {
-            case 'pharmacy':
-                return (
-                    <>
-                        <button
-                            onClick={() => navigateTo('/pharmacy/stock')}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg ${theme.hover} ${theme.text} transition-all duration-200 font-medium`}
-                        >
-                            <LayoutDashboard size={18} />
-                            Dashboard
-                        </button>
-                        <button
-                            onClick={() => navigateTo('/analytics')}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg ${theme.hover} ${theme.text} transition-all duration-200 font-medium`}
-                        >
-                            <LayoutDashboard size={18} />
-                            Analytics
-                        </button>
-                        <button
-                            onClick={handleLogout}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg ${theme.button} text-white transition-all duration-200 font-medium ml-2`}
-                        >
-                            <LogOut size={18} />
-                            Logout
-                        </button>
-
-                    </>
-                );
-            case 'user':
-                return (
-                    <>
-                        <button
-                            onClick={() => navigateTo('/')}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg ${theme.hover} ${theme.text} transition-all duration-200 font-medium`}
-                        >
-                            <LayoutDashboard size={18} />
-                            Dashboard
-                        </button>
-                        <button
-                            onClick={() => navigateTo('/user/bloodDonationUserPage')}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg ${theme.hover} ${theme.text} transition-all duration-200 font-medium`}
-                        >
-                            <Droplet size={18} />
-                            Blood Donation
-                        </button>
-                        <button
-                            onClick={() => navigateTo('/analytics')}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg ${theme.hover} ${theme.text} transition-all duration-200 font-medium`}
-                        >
-                            <LayoutDashboard size={18} />
-                            Analytics
-                        </button>
-                        <button
-                            onClick={() => navigateTo('/about')}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg ${theme.hover} ${theme.text} transition-all duration-200 font-medium`}
-                        >
-                            <LayoutDashboard size={18} />
-                            About Us
-                        </button>
-                        <button
-                            onClick={handleLogout}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg ${theme.button} text-white transition-all duration-200 font-medium ml-2`}
-                        >
-                            <LogOut size={18} />
-                            Logout
-                        </button>
-                    </>
-                );
-            case 'hospital':
-                return (
-                    <>
-                        <button
-                            onClick={() => navigateTo('/hospital/emergencies')}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg ${theme.hover} ${theme.text} transition-all duration-200 font-medium`}
-                        >
-                            <Activity size={18} />
-                            Emergencies
-                        </button>
-                        <button
-                            onClick={() => navigateTo('/hospital/bloodDonationHospitalPage')}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg ${theme.hover} ${theme.text} transition-all duration-200 font-medium`}
-                        >
-                            <Droplet size={18} />
-                            Blood
-                        </button>
-                        <button
-                            onClick={() => navigateTo('/analytics')}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg ${theme.hover} ${theme.text} transition-all duration-200 font-medium`}
-                        >
-                            <LayoutDashboard size={18} />
-                            Analytics
-                        </button>
-                        <button
-                            onClick={handleLogout}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg ${theme.button} text-white transition-all duration-200 font-medium ml-2`}
-                        >
-                            <LogOut size={18} />
-                            Logout
-                        </button>
-                    </>
-                );
-            default:
-                return null;
-        }
-    };
+            <span className="relative z-[2] flex items-center gap-2">
+                {Icon && <Icon size={18} />}
+                {children}
+            </span>
+        </button>
+    );
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-lg">
-            <div
-                className={`bg-gradient-to-r ${theme.gradient} border-b ${theme.border} shadow-lg backdrop-saturate-150`}
+        <>
+            {/* ✅ OPEN ARROW BUTTON */}
+            {!isOpen && (
+                <button
+                    onClick={() => setIsOpen(true)}
+                    className={`fixed top-8 left-6 z-40 backdrop-blur-xl border border-white/20 bg-black/40 p-3 rounded-full shadow-2xl shadow-black/20 hover:scale-110 transition-all duration-300`}
+                >
+                    <ChevronRight size={22} className="text-white" />
+                </button>
+            )}
+
+            {/* ✅ OVERLAY */}
+            {isOpen && (
+                <div
+                    className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 transition-opacity duration-300"
+                    onClick={() => setIsOpen(false)}
+                />
+            )}
+
+            {/* ✅ SIDEBAR */}
+            <aside
+                className={`fixed top-0 left-0 h-full w-72 z-[60] backdrop-blur-xl border-r border-white/10 bg-black/40 shadow-2xl transform transition-transform duration-300 ease-in-out ${
+                    isOpen ? "translate-x-0" : "-translate-x-full"
+                }`}
             >
-                <div className="container mx-auto px-6 py-4">
-                    <div className="flex items-center justify-between">
-                        {/* Logo Section */}
-                        <div
-                            onClick={() => navigate('/')}
-                            className="flex items-center gap-3 cursor-pointer group"
-                        >
-                            <div className={`p-2 rounded-lg ${theme.button} transition-all duration-300 group-hover:scale-110`}>
-                                <Activity className="text-white" size={24} />
-                            </div>
-                            <h1 className={`text-2xl font-bold ${theme.text} tracking-tight`}>
-                                Lifeline
-                            </h1>
-                            {role && (
-                                <span className={`text-sm px-3 py-1 rounded-full ${theme.button} text-white font-medium capitalize`}>
-                                    {role}
-                                </span>
-                            )}
+                {/* ✅ HEADER WITH CLOSE ARROW */}
+                <div className="flex items-center justify-between px-6 py-6 border-b border-white/10">
+                    <div
+                        className="flex items-center gap-3 cursor-pointer"
+                        onClick={() => navigateTo("/")}
+                    >
+                        <div className={`${theme.button} p-2 rounded-full`}>
+                            <Activity className="text-white" size={22} />
                         </div>
 
-                        {/* Navigation Buttons */}
-                        <nav className="flex items-center gap-2">
-                            {renderNavigation()}
-                        </nav>
+                        <h1 className={`text-xl font-semibold ${theme.text}`}>
+                            Lifeline
+                        </h1>
                     </div>
-                </div>
-            </div>
-        </header>
-    );
-};
 
-export default Header;
+                    <button
+                        onClick={() => setIsOpen(false)}
+                        className={`p-2 ${theme.button} rounded-full`}
+                    >
+                        <ChevronLeft size={20} className="text-white" />
+                    </button>
+                </div>
+
+                {/* ✅ ROLE BADGE */}
+                {role && role !== "null" && (
+                    <div className="px-6 py-4">
+                        <span className={`inline-block px-3 py-1 rounded-full text-white text-xs ${theme.button}`}>
+                            {role}
+                        </span>
+                    </div>
+                )}
+
+                {/* ✅ NAVIGATION ITEMS */}
+                <nav className="flex flex-col gap-3 px-6 mt-4 overflow-y-auto max-h-[calc(100vh-180px)]">
+                    {!role || role === "null" ? (
+                        <>
+                            <NavItem
+                                onClick={() => navigateTo("/analytics")}
+                                icon={LayoutDashboard}
+                            >
+                                Analytics
+                            </NavItem>
+
+                            <NavItem
+                                onClick={() => navigateTo("/about")}
+                                icon={LayoutDashboard}
+                            >
+                                About Us
+                            </NavItem>
+
+                            <NavItem
+                                onClick={() => navigateTo("/")}
+                                icon={User}
+                            >
+                                Login
+                            </NavItem>
+                        </>
+                    ) : null}
+
+                    {role === "pharmacy" && (
+                        <>
+                            <NavItem
+                                onClick={() => navigateTo("/pharmacy/stock")}
+                                icon={LayoutDashboard}
+                            >
+                                Dashboard
+                            </NavItem>
+
+                            <NavItem
+                                onClick={() => navigateTo("/analytics")}
+                                icon={LayoutDashboard}
+                            >
+                                Analytics
+                            </NavItem>
+
+                            <NavItem onClick={handleLogout} icon={LogOut}>
+                                Logout
+                            </NavItem>
+                        </>
+                    )}
+
+                    {role === "user" && (
+                        <>
+                            <NavItem
+                                onClick={() => navigateTo("/")}
+                                icon={LayoutDashboard}
+                            >
+                                Dashboard
+                            </NavItem>
+
+                            <NavItem
+                                onClick={() =>
+                                    navigateTo("/user/bloodDonationUserPage")
+                                }
+                                icon={Droplet}
+                            >
+                                Blood
+                            </NavItem>
+
+                            <NavItem
+                                onClick={() => navigateTo("/analytics")}
+                                icon={LayoutDashboard}
+                            >
+                                Analytics
+                            </NavItem>
+
+                            <NavItem
+                                onClick={() => navigateTo("/about")}
+                                icon={LayoutDashboard}
+                            >
+                                About Us
+                            </NavItem>
+
+                            <NavItem onClick={handleLogout} icon={LogOut}>
+                                Logout
+                            </NavItem>
+                        </>
+                    )}
+
+                    {role === "hospital" && (
+                        <>
+                            <NavItem
+                                onClick={() =>
+                                    navigateTo("/hospital/emergencies")
+                                }
+                                icon={Activity}
+                            >
+                                Emergencies
+                            </NavItem>
+
+                            <NavItem
+                                onClick={() =>
+                                    navigateTo(
+                                        "/hospital/bloodDonationHospitalPage"
+                                    )
+                                }
+                                icon={Droplet}
+                            >
+                                Blood
+                            </NavItem>
+
+                            <NavItem
+                                onClick={() => navigateTo("/analytics")}
+                                icon={LayoutDashboard}
+                            >
+                                Analytics
+                            </NavItem>
+
+                            <NavItem onClick={handleLogout} icon={LogOut}>
+                                Logout
+                            </NavItem>
+                        </>
+                    )}
+                </nav>
+            </aside>
+        </>
+    );
+}
