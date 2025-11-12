@@ -165,10 +165,10 @@ const AIChatbot = () => {
 
     const handleAskQuery = async (query) => {
         try {
-            const response = await fetch(import.meta.env.VITE_AI_SERVER_URL+'/ai/ask_query', {
+            const response = await fetch(import.meta.env.VITE_AI_SERVER_URL+'/ai/medical_assist', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ query })
+                body: JSON.stringify({ message: query })
             });
 
             if (!response.ok) throw new Error('Failed to process query');
