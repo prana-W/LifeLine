@@ -15,6 +15,10 @@ This is the repository for LifeLine, developed by Team Hawkins Horizon, in a 24-
 ![Node](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)
 ![MongoDB](https://img.shields.io/badge/MongoDB-6.0-green)
 
+## How to run?
+
+`docker compose -f docker-compose.prod.yml up`
+
 ## 🌟 Features
 
 ### 🔴 Blood Donation System
