@@ -1,65 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Heart, Github, Linkedin, Mail, Phone, MapPin, Eye, Activity, Pill, User } from "lucide-react";
+import { Heart, Github, Linkedin, Mail, Phone, MapPin, Eye, Activity } from "lucide-react";
 import useApi from "@/hooks/useApi";
-
-// ============================
-// THEME & CONTENT MAP (PER ROLE)
-// ============================
-const roleConfig = {
-  pharmacy: {
-    theme: {
-      waveGradient: ["#D8C4FF", "#BFA6FF", "#A78FFF"],
-      footerGradient: "linear-gradient(135deg, #D8C4FF, #BFA6FF, #A78FFF, #957AFF)",
-      iconColor: "#7A67C7",
-      accent: "#B8A8FF"
-    },
-    icon: Pill,
-    quickLinks: [
-      { label: "Home", href: "/pharmacy" },
-      { label: "Manage Stock", href: "/pharmacy/stock" },
-      { label: "Orders", href: "/pharmacy/orders" },
-      { label: "Analytics", href: "/pharmacy/analytics" },
-      { label: "Support", href: "/pharmacy/support" }
-    ],
-    tagline: "Managing medicines, ensuring health for all."
-  },
-
-  hospital: {
-    theme: {
-      waveGradient: ["#0F766E", "#0E7490", "#134E4A"],
-      footerGradient: "linear-gradient(135deg, #1BA79A, #118A7E, #0F766E)",
-      iconColor: "#4AD2CC",
-      accent: "#3BB5AF"
-    },
-    icon: Activity,
-    quickLinks: [
-      { label: "Dashboard", href: "/hospital" },
-      { label: "Emergencies", href: "/hospital/emergencies" },
-      { label: "Blood Bank", href: "/hospital/blood" },
-      { label: "Patients", href: "/hospital/patients" },
-      { label: "Staff", href: "/hospital/staff" }
-    ],
-    tagline: "Saving lives, one emergency at a time."
-  },
-
-  user: {
-    theme: {
-      waveGradient: ["#0891b2", "#06b6d4", "#14b8a6"],
-      footerGradient: "linear-gradient(135deg, #0891b2, #06b6d4, #14b8a6)",
-      iconColor: "#06b6d4",
-      accent: "#67e8f9"
-    },
-    icon: User,
-    quickLinks: [
-      { label: "Home", href: "/" },
-      { label: "About Us", href: "/about" },
-      { label: "Find Hospital", href: "/hospitals" },
-      { label: "Blood Donation", href: "/donate" },
-      { label: "Emergency", href: "/emergency" }
-    ],
-    tagline: "Your health, our priority. Connect with care instantly."
-  }
-};
 
 export default function Footer() {
   const [visitorCount, setVisitorCount] = useState(0);
@@ -68,10 +9,25 @@ export default function Footer() {
 
   const api = useApi();
 
-  // Detect role from localStorage
-  const role = localStorage.getItem("role") || "user";
-  const config = roleConfig[role] || roleConfig.user;
-  const { theme, icon: RoleIcon, quickLinks, tagline } = config;
+  // ✅ STATIC THEME (same for every page)
+  const theme = {
+    waveGradient: ["#0ea5e9", "#38bdf8", "#0ea5e9"],
+    footerGradient: "linear-gradient(135deg, #0f172a, #1e293b, #0f172a)",
+    iconColor: "#38bdf8",
+    accent: "#4fd1c5"
+  };
+
+  // ✅ Static Quick Links (universal)
+  const quickLinks = [
+    { label: "Home", href: "/" },
+    { label: "Find Hospital", href: "/hospitals" },
+    { label: "About Us", href: "/about" },
+    { label: "Blood Donation", href: "/donate" },
+    { label: "Emergency", href: "/emergency" }
+  ];
+
+  // ✅ Static tagline
+  const tagline = "Connecting healthcare with simplicity and speed.";
 
   // Fetch & increment visitors
   useEffect(() => {
@@ -121,7 +77,7 @@ export default function Footer() {
           style={{ height: "100px", transform: "rotate(180deg)" }}
         >
           <defs>
-            <linearGradient id={`footerWave-${role}`} x1="0%" y1="0%" x2="100%" y2="0%">
+            <linearGradient id="footerWave" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor={theme.waveGradient[0]} />
               <stop offset="50%" stopColor={theme.waveGradient[1]} />
               <stop offset="100%" stopColor={theme.waveGradient[2]} />
@@ -129,7 +85,7 @@ export default function Footer() {
           </defs>
 
           <path
-            fill={`url(#footerWave-${role})`}
+            fill="url(#footerWave)"
             d="M0,0 C150,60 350,0 600,40 C850,80 1050,20 1200,50 L1200,120 L0,120 Z"
           />
         </svg>
@@ -146,7 +102,7 @@ export default function Footer() {
             {/* BRAND */}
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <RoleIcon className="h-8 w-8" style={{ color: theme.iconColor }} />
+                <Activity className="h-8 w-8" style={{ color: theme.iconColor }} />
                 <span className="text-2xl font-bold">LifeLine</span>
               </div>
 
@@ -260,7 +216,7 @@ export default function Footer() {
             </p>
 
             <p className="text-xs opacity-80 mt-2 flex items-center justify-center gap-1">
-              Made with <Heart className="h-3 w-3 inline animate-pulse" fill="currentColor" /> for better healthcare
+              Made with <Heart className="h-3 w-3 inline animate-pulse" fill="currentColor" /> to support better healthcare.
             </p>
           </div>
         </div>
