@@ -3,6 +3,7 @@ import { Header, Footer } from './components';
 import { Toaster } from '@/components/ui/sonner';
 import { useEffect, useState } from "react";
 import CookiePopup from "@/components/CookiePopup.jsx";
+import AIChatbot from "@/components/AIChatBotComponent.jsx";
 
 function Layout() {
     const [popUp, setPopUp] = useState("true");
@@ -29,13 +30,12 @@ function Layout() {
                 <Footer />
             </div>
 
-            {/* ✅ Fullscreen overlay to perfectly center popup */}
             {popUp === "true" && (
                 <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm">
                     <CookiePopup onClose={handleClosePopup} />
                 </div>
             )}
-
+            <AIChatbot />
             <Toaster />
         </>
     );
