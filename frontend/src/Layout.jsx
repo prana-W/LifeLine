@@ -7,12 +7,15 @@ import AIChatbot from "@/components/AIChatBotComponent.jsx";
 
 function Layout() {
     const [popUp, setPopUp] = useState("true");
+    const [role, setRole] = useState(null);
 
     useEffect(() => {
         const isCookiePopUp = localStorage.getItem('cookie-popup');
         if (!isCookiePopUp) {
             localStorage.setItem('cookie-popup', "true");
         }
+        const userRole = localStorage.getItem('role');
+        setRole(userRole)
         setPopUp(isCookiePopUp);
     }, []);
 
@@ -35,7 +38,7 @@ function Layout() {
                     <CookiePopup onClose={handleClosePopup} />
                 </div>
             )}
-            <AIChatbot />
+            {role === 'user' && <AIChatbot />}
             <Toaster />
         </>
     );
