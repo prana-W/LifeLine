@@ -1,6 +1,16 @@
 version: "3.8"
 
 services:
+  frontend:
+    build: ./frontend
+    container_name: lifeline-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      - ai-server
+
   backend:
     build: ./server
     container_name: lifeline
