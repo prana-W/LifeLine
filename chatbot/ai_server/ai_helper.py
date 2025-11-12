@@ -3,7 +3,6 @@ from django.conf import settings
 import json
 
 
-# 🧠 1️⃣ Convert JSON to human-readable summaries
 def generate_human_readable_message(data: dict) -> str:
     genai.configure(api_key=settings.GOOGLE_CLOUD_API_KEY)
     model = genai.GenerativeModel('gemini-2.5-flash')
@@ -27,7 +26,6 @@ Message:"""
     return response.text.strip()
 
 
-# 🚑 2️⃣ Route user message to the correct backend API
 def select_route_from_message(message: str, action: str, assist_routes: list, navigate_routes: list) -> str:
     genai.configure(api_key=settings.GOOGLE_CLOUD_API_KEY)
     model = genai.GenerativeModel('gemini-2.5-flash')
@@ -65,12 +63,7 @@ Always return only the correct route path, no extra text."""
     return ''
 
 
-# 💊 3️⃣ Medical Assist — AI general physician
 def medical_assist_advice(symptom_message: str) -> str:
-    """
-    Generates safe, general medical recommendations for LifeLine users.
-    Uses Gemini to summarize, provide at-home remedies, and suggest doctor visits when needed.
-    """
     genai.configure(api_key=settings.GOOGLE_CLOUD_API_KEY)
     model = genai.GenerativeModel('gemini-2.5-flash')
 

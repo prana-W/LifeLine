@@ -2,20 +2,31 @@ version: "3.8"
 
 services:
   backend:
-    build: .
+    build: ./server
     container_name: lifeline
     restart: always
     ports:
       - "8000:8000"
     env_file:
-      - .env
+      - ./server/.env
     environment:
       MONGODB_URI: mongodb://mongo:27017/lifeline-db
     depends_on:
       - mongo
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+
+
+  ai-server:
+    build: ./chatbot
+    container_name: ai-server
+    restart: always
+    ports:
+      - "8001:8001"
+    env_file:
+      - ./chatbot/.env
+    depends_on:
+      - mongo
+      - backend
+
 
   mongo:
     image: mongo:6
