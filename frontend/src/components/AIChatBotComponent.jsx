@@ -174,7 +174,7 @@ const AIChatbot = () => {
             if (!response.ok) throw new Error('Failed to process query');
 
             const data = await response.json();
-            addMessage(data.message || data.response || 'Query processed successfully.');
+            addMessage(data?.recommendation || 'Query processed successfully.');
         } catch (error) {
             console.error('Ask query error:', error);
             addMessage('Sorry, I encountered an error processing your query.', false, true);

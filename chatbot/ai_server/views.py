@@ -3,7 +3,11 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from .serializers import GetRouteSerializer, MessageSerializer, InterpretSerializer
-from .ai_helper import select_route_from_message, generate_human_readable_message
+from .ai_helper import (
+    select_route_from_message,
+    generate_human_readable_message,
+    medical_assist_advice
+)
 
 assist_route_list = [
  '/user/emergency',
@@ -71,7 +75,19 @@ def interpret(request):
 def medical_assist(request):
     serializer = MessageSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    return Response(serializer.data)
+    user_message = serializer.validated_data['message']
+
+    try:
+        ai_advice = medical_assist_advice(user_message)
+        return Response({
+            'user_message': user_message,
+            'recommendation': ai_advice
+        })
+    except Exception as e:
+        return Response(
+            {'error': f'Failed to generate advice: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
 @api_view(['GET'])
 def check_health(request):
