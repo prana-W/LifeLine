@@ -14,8 +14,12 @@ import {
   DollarSign,
   X
 } from "lucide-react";
+import useApi from "@/hooks/useApi.js";
 
 export default function Stock() {
+
+    const api = useApi();
+
   const [search, setSearch] = useState("");
   const [filtered, setFiltered] = useState([]);
   const [allMedicines, setAllMedicines] = useState([]);
@@ -25,99 +29,131 @@ export default function Stock() {
   const [slideDirection, setSlideDirection] = useState(0);
   const wrapperRef = useRef(null);
 
-  // Add Medicine Modal
-  const [addModalOpen, setAddModalOpen] = useState(false);
-  const [newMed, setNewMed] = useState({ name: "", quantity: "", price: "" });
+    // ===================== ADD MEDICINE MODAL =====================
+    const [addModalOpen, setAddModalOpen] = useState(false);
+    const [newMed, setNewMed] = useState({ name: "", quantity: "", price: "" });
 
-  // Mock data
-  useEffect(() => {
-    const mockMedicines = [
-      { _id: "1", name: "Paracetamol", quantity: 150, price: 5 },
-      { _id: "2", name: "Ibuprofen", quantity: 80, price: 8 },
-      { _id: "3", name: "Amoxicillin", quantity: 0, price: 12 },
-      { _id: "4", name: "Aspirin", quantity: 200, price: 3 },
-      { _id: "5", name: "Omeprazole", quantity: 45, price: 15 },
-      { _id: "6", name: "Metformin", quantity: 120, price: 10 },
-      { _id: "7", name: "Atorvastatin", quantity: 0, price: 18 },
-      { _id: "8", name: "Lisinopril", quantity: 95, price: 14 },
-    ];
-    setAllMedicines(mockMedicines);
-    setFiltered(mockMedicines);
-    setLoaded(true);
-  }, []);
+// ===================== FETCH MEDICINES =====================
+    useEffect(() => {
+        async function fetchMedicines() {
+            const { success, data } = await api.get("/pharmacy/getAllMedicines");
+            if (success && data?.medicines) {
+                setAllMedicines(data.medicines);
+                setFiltered(data.medicines);
+                setLoaded(true);
+            }
+        }
 
-  // Filter search
-  useEffect(() => {
-    if (!loaded) return;
-    const s = search.trim().toLowerCase();
-    if (!s) return setFiltered(allMedicines);
-    const f = allMedicines.filter((m) =>
-      m.name.toLowerCase().startsWith(s)
-    );
-    setFiltered(f);
-  }, [search, allMedicines, loaded]);
+        fetchMedicines();
+    }, []);
 
-  // Close dropdown on click outside
-  useEffect(() => {
-    function handleClickOutside(e) {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+// ===================== SEARCH LOGIC =====================
+    useEffect(() => {
+        if (!loaded) return;
+
+        const s = search.trim().toLowerCase();
+        if (!s) return setFiltered(allMedicines);
+
+        const f = allMedicines.filter((m) => m.name.toLowerCase().startsWith(s));
+        setFiltered(f);
+    }, [search, allMedicines, loaded]);
+
+// ===================== DROPDOWN CLOSE =====================
+    useEffect(() => {
+        function handleClickOutside(e) {
+            if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+                setShowDropdown(false);
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+// ===================== SELECT MEDICINE =====================
+    const handleSelect = (med) => {
+        const currentIndex = allMedicines.findIndex((m) => m._id === selected?._id);
+        const newIndex = allMedicines.findIndex((m) => m._id === med._id);
+        setSlideDirection(newIndex > currentIndex ? 1 : -1);
+        setSelected(med);
+        setSearch(med.name);
         setShowDropdown(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const handleSelect = (med) => {
-    const currentIndex = allMedicines.findIndex((m) => m._id === selected?._id);
-    const newIndex = allMedicines.findIndex((m) => m._id === med._id);
-    setSlideDirection(newIndex > currentIndex ? 1 : -1);
-    setSelected(med);
-    setSearch(med.name);
-    setShowDropdown(false);
-  };
-
-  const updateLocal = (id, delta) => {
-    setAllMedicines((prev) =>
-      prev.map((m) =>
-        m._id === id
-          ? { ...m, quantity: Math.max(0, m.quantity + delta) }
-          : m
-      )
-    );
-    setSelected((prev) =>
-      prev && prev._id === id
-        ? { ...prev, quantity: Math.max(0, prev.quantity + delta) }
-        : prev
-    );
-  };
-
-  const handleIncrement = () => updateLocal(selected._id, 10);
-  const handleDecrement = () =>
-    selected.quantity > 0 && updateLocal(selected._id, -10);
-
-  const handleDelete = () => {
-    setAllMedicines((prev) => prev.filter((m) => m._id !== selected._id));
-    setFiltered((prev) => prev.filter((m) => m._id !== selected._id));
-    setSelected(null);
-  };
-
-  // Add new medicine handler
-  const handleAddNewMedicine = () => {
-    if (!newMed.name.trim()) return;
-    const newItem = {
-      _id: Date.now().toString(),
-      name: newMed.name,
-      quantity: Number(newMed.quantity),
-      price: Number(newMed.price),
     };
-    setAllMedicines((prev) => [...prev, newItem]);
-    setFiltered((prev) => [...prev, newItem]);
-    setNewMed({ name: "", quantity: "", price: "" });
-    setAddModalOpen(false);
-  };
 
-  const getSideCards = () => {
+// ===================== LOCAL UPDATE HELPERS =====================
+    const updateLocal = (id, delta) => {
+        setAllMedicines((prev) =>
+            prev.map((m) =>
+                m._id === id ? { ...m, quantity: Math.max(0, m.quantity + delta) } : m
+            )
+        );
+
+        setSelected((prev) =>
+            prev && prev._id === id
+                ? { ...prev, quantity: Math.max(0, prev.quantity + delta) }
+                : prev
+        );
+    };
+
+    const removeLocal = (id) => {
+        setAllMedicines((prev) => prev.filter((m) => m._id !== id));
+        setFiltered((prev) => prev.filter((m) => m._id !== id));
+        if (selected?._id === id) setSelected(null);
+    };
+
+// ===================== UPDATE QUANTITY =====================
+    const handleIncrement = async () => {
+        const id = selected._id;
+        updateLocal(id, 10);
+
+        const res = await api.put(`/pharmacy/updateMedicine/${id}`, { delta: 10 });
+        if (!res.success) updateLocal(id, -10);
+    };
+
+    const handleDecrement = async () => {
+        const id = selected._id;
+        if (selected.quantity <= 0) return;
+
+        updateLocal(id, -10);
+
+        const res = await api.put(`/pharmacy/updateMedicine/${id}`, { delta: -10 });
+        if (!res.success) updateLocal(id, 10);
+    };
+
+// ===================== DELETE MEDICINE =====================
+    const handleDelete = async () => {
+        const id = selected._id;
+        const backup = selected;
+        removeLocal(id);
+
+        const res = await api.delete(`/pharmacy/deleteMedicine/${id}`);
+        if (!res.success) {
+            setAllMedicines((prev) => [...prev, backup]);
+            setSelected(backup);
+        }
+    };
+
+// ===================== ADD NEW MEDICINE =====================
+    const handleAddNewMedicine = async () => {
+        if (!newMed.name.trim()) return;
+
+        const payload = {
+            name: newMed.name,
+            quantity: Number(newMed.quantity),
+            price: Number(newMed.price),
+        };
+
+        const res = await api.post("/pharmacy/addNewMedicine", payload);
+
+        if (res.success && res.data?.medicine) {
+            setAllMedicines((prev) => [...prev, res.data.medicine]);
+            setFiltered((prev) => [...prev, res.data.medicine]);
+            setNewMed({ name: "", quantity: "", price: "" });
+            setAddModalOpen(false);
+        }
+    };
+
+    const getSideCards = () => {
     if (!selected) return { left: null, right: null };
     const idx = allMedicines.findIndex((m) => m._id === selected._id);
     return {
