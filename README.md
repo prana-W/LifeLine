@@ -1,4 +1,15 @@
-# Problem Statement
+# Lifeline - Comprehensive Blood Donation & Emergency Management System
+
+![Node](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)
+![MongoDB](https://img.shields.io/badge/MongoDB-6.0-green)
+
+This is the repository for LifeLine, developed by Team Hawkins Horizon, in a 24-hour hackathon conducted by Pravardhan-26. LifeLine is a full-stack web application that revolutionizes blood donation management and emergency response with real-time tracking, automated alerts, and integrated hospital coordination.
+
+> 🏆 **Winner of the First Prize at the Pravardhan-25 Hackathon!**
+> 
+> <img src="./assets/certificate.jpeg" alt="Hackathon Certificate" width="600"/>
+
+## Problem Statement
 
 **Problem**: During medical emergencies, people lose crucial time searching for specific blood types or medicines. Existing systems are scattered. The hospitals, pharmacies, and donors rarely stay updated.
 
@@ -7,13 +18,6 @@
    **Add-ons**:
    - Location-based search and SOS alerts
    - AI-powered prediction of shortages or demand spikes
-
-# Lifeline - Comprehensive Blood Donation & Emergency Management System
-
-This is the repository for LifeLine, developed by Team Hawkins Horizon, in a 24-hour hackathon conducted by Pravardhan-26. LifeLine is a full-stack web application that revolutionizes blood donation management and emergency response with real-time tracking, automated alerts, and integrated hospital coordination.
-
-![Node](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)
-![MongoDB](https://img.shields.io/badge/MongoDB-6.0-green)
 
 ## How to run?
 
@@ -138,16 +142,12 @@ The system uses **MongoDB** with the following collections:
 
 **Team Hawkins Horizon**
 
-| Team Member | Role                      | Responsibilities                                                      |
-|------|---------------------------|-----------------------------------------------------------------------|
-| **Pranaw Kumar** | Backend Developer         | API development, database design, authentication & security           |
-| **Sisanta Chhatoi** | AI/ML Developer           | AI Chatbot development, devops and deployment                         |
-| **Ashutosh Kumar Rawat** | Frontend Developer        | React components, UI implementation, API integration                  |
-| **Ruchika Ruhanshi** | UI/UX Designer & Designer | Design systems, user experience, project coordination & brainstorming |
-
-## 📞 Support
-
-For support, email pranaw.kr.dev@gmail.com or open an issue in the GitHub repository.
+| Team Member | Role                      | Responsibilities                                                      | GitHub |
+|------|---------------------------|-----------------------------------------------------------------------|--------|
+| **Pranaw Kumar** | Backend Developer         | API development, database design, authentication & security           | [prana-W](https://github.com/prana-W) |
+| **Ashutosh Kumar Rawat** | Frontend Developer        | React components, UI implementation, API integration                  | [ashutoshkrrawat](https://github.com/ashutoshkrrawat) |
+| **Sisanta Chhatoi** | AI/ML Developer           | AI Chatbot development, devops and deployment                         | [sisantaChhatoi](https://github.com/sisantaChhatoi) |
+| **Ruchika Ruhanshi** | UI/UX Designer & Designer | Design systems, user experience, project coordination & brainstorming | [RuchikaRuhanshi](https://github.com/RuchikaRuhanshi) |
 
 ---
 
