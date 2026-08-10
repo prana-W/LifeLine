@@ -29,6 +29,8 @@ ALLOWED_HOSTS = [
 # ✅ Allow frontend origins
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",              # Local Vite dev
+    "http://localhost:5177",              # Local Docker frontend
+    "http://127.0.0.1:5177",
     "https://lifeline-coral.vercel.app",  # Deployed frontend
 ]
 
